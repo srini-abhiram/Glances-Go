@@ -1,11 +1,12 @@
 package main
 
 import (
+	"sort"
+	"time"
+
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/process"
-	"sort"
-	"time"
 )
 
 // Process holds information about a single running process
@@ -16,6 +17,13 @@ type Process struct {
 	Memory float32 `json:"memory"`
 }
 
+// CpuInfo holds information about the CPU the application is hosted on
+type CpuInfo struct {
+	CpuModelName string `json:"model"`
+	MaxFrequency int32  `json:"maxFrequency"`
+	Cores        int32  `json:"cores"`
+}
+
 // SystemStats is the main structure for all system metrics
 type SystemStats struct {
 	CPUUsage       float64   `json:"cpu_usage"`
@@ -23,6 +31,7 @@ type SystemStats struct {
 	MemUsed        uint64    `json:"mem_used"`
 	MemUsedPercent float64   `json:"mem_used_percent"`
 	Processes      []Process `json:"processes"`
+	CPUInfo        []CpuInfo `json:"cpu_info"`
 }
 
 func collectStats() (SystemStats, error) {
@@ -36,6 +45,23 @@ func collectStats() (SystemStats, error) {
 	if len(cpuPercentages) > 0 {
 		stats.CPUUsage = cpuPercentages[0]
 	}
+
+	// CPU Info
+	cpuInfoArr, err := cpu.Info()
+	if err != nil {
+		return stats, err
+	}
+	var cpuInfoList []CpuInfo
+	for _, cpu := range cpuInfoArr {
+		cpuInfo := CpuInfo{
+			CpuModelName: cpu.ModelName,
+			MaxFrequency: int32(cpu.Mhz),
+			Cores:        int32(cpu.Cores),
+		}
+		cpuInfoList = append(cpuInfoList, cpuInfo)
+	}
+
+	stats.CPUInfo = cpuInfoList
 
 	// Memory Usage
 	vm, err := mem.VirtualMemory()
@@ -63,10 +89,10 @@ func collectStats() (SystemStats, error) {
 		mem, _ := p.MemoryPercent()
 
 		processes = append(processes, Process{
-			Pid:     pid,
-			Name:    name,
-			CPU:     cpu,
-			Memory:  mem,
+			Pid:    pid,
+			Name:   name,
+			CPU:    cpu,
+			Memory: mem,
 		})
 	}
 
