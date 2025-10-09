@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Go Glances</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Go Glances</h1>
+        <div class="stats-grid">
+            <div class="stats-card">
+                <h2>CPU</h2>
+                <p>Usage: <span id="cpu-usage">...</span>%</p>
+            </div>
+            <div class="stats-card">
+                <h2>Memory</h2>
+                <p>Used: <span id="mem-used">...</span> / <span id="mem-total">...</span> GB</p>
+                <p>Usage: <span id="mem-percent">...</span>%</p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

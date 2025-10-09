@@ -1,0 +1,49 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
+    color: #1c1e21;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #1877f2;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stats-card {
+    padding: 20px;
+    border: 1px solid #dddfe2;
+    border-radius: 8px;
+}
+
+.stats-card h2 {
+    margin-top: 0;
+    color: #606770;
+    font-size: 1.2em;
+}
+
+.stats-card p {
+    margin: 5px 0;
+    font-size: 1em;
+}
+
+.stats-card span {
+    font-weight: bold;
+    color: #1877f2;
+}
