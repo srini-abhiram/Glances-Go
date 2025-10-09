@@ -74,6 +74,7 @@ func collectStats() (SystemStats, error) {
 		return stats, err
 	}
 
+
 	var wg sync.WaitGroup
 	processChan := make(chan Process, len(pids))
 
