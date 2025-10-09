@@ -1,4 +1,5 @@
 name: Go Lint
+
 on:
   push:
     branches: [ master ]
@@ -13,19 +14,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ Set up Go (use your real project version here)
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.25.x'
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: go mod tidy
 
-      - name: Install golangci-lint (built with Go 1.25)
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.61.0
+      # 4️⃣ Temporarily downgrade Go version in go.mod for linting
+      - name: Patch go.mod to Go 1.23 for lint
+        run: |
+          cp go.mod go.mod.bak
+          sed -i 's/^go 1\.25/go 1.23/' go.mod
 
+      # 5️⃣ Run golangci-lint using official GitHub Action
       - name: Run golangci-lint
-        run: golangci-lint run --timeout=5m
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.61.0  # latest as of Oct 2025 (built with Go 1.23)
+          args: --timeout=5m
+          install-mode: binary
+          only-new-issues: false
+          skip-cache: false
+
+      # 6️⃣ Restore original go.mod file
+      - name: Restore go.mod
+        run: mv go.mod.bak go.mod
