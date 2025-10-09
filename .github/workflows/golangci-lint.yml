@@ -28,22 +28,14 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
 
-      # 4️⃣ Temporarily downgrade Go version in go.mod for linting
-      - name: Patch go.mod to Go 1.23 for lint
-        run: |
-          cp go.mod go.mod.bak
-          sed -i 's/^go 1\.25/go 1.23/' go.mod
-
-      # 5️⃣ Run golangci-lint using official GitHub Action
+      # 4️⃣ Run golangci-lint using official GitHub Action
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.61.0  # latest as of Oct 2025 (built with Go 1.23)
-          args: --timeout=5m
+          version: v2.5.0  # latest stable version as of Sep 2025
           install-mode: binary
+          args: --timeout=5m
           only-new-issues: false
           skip-cache: false
+          skip-save-cache: false
 
-      # 6️⃣ Restore original go.mod file
-      - name: Restore go.mod
-        run: mv go.mod.bak go.mod
