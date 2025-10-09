@@ -11,6 +11,23 @@ function fetchStats() {
             document.getElementById('mem-used').textContent = memUsedGB;
             document.getElementById('mem-total').textContent = memTotalGB;
             document.getElementById('mem-percent').textContent = data.mem_used_percent.toFixed(2);
+
+            // Update Process List
+            const processBody = document.getElementById('process-list-body');
+            processBody.innerHTML = ''; // Clear old data
+
+            if (data.processes) {
+                data.processes.forEach(proc => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${proc.pid}</td>
+                        <td>${proc.name}</td>
+                        <td>${proc.cpu.toFixed(2)}</td>
+                        <td>${proc.memory.toFixed(2)}</td>
+                    `;
+                    processBody.appendChild(row);
+                });
+            }
         })
         .catch(error => console.error('Error fetching stats:', error));
 }
