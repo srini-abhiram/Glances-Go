@@ -1,0 +1,14 @@
+run:
+  timeout: 5m
+linters:
+  enable:
+    - govet
+    - errcheck
+    - gofmt
+    - staticcheck
+    - ineffassign
+    - unused
+issues:
+  exclude-use-default: false
+  exclude:
+    - "Error return value of .((os|io).Close|fmt.Fprintf). is not checked"
