@@ -4,6 +4,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    paths:
+      - '**.go'
 jobs:
   golangci-lint:
     name: Run golangci-lint
