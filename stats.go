@@ -35,12 +35,13 @@ type CpuInfo struct {
 
 // SystemStats is the main structure for all system metrics
 type SystemStats struct {
-	CPUUsage       float64   `json:"cpu_usage"`
-	MemTotal       uint64    `json:"mem_total"`
-	MemUsed        uint64    `json:"mem_used"`
-	MemUsedPercent float64   `json:"mem_used_percent"`
-	Processes      []Process `json:"processes"`
-	CPUInfo        []CpuInfo `json:"cpu_info"`
+	CPUUsage        float64   `json:"cpu_usage"`
+	CPUPerCoreUsage []float64 `json:"cpu_per_core_usage"`
+	MemTotal        uint64    `json:"mem_total"`
+	MemUsed         uint64    `json:"mem_used"`
+	MemUsedPercent  float64   `json:"mem_used_percent"`
+	Processes       []Process `json:"processes"`
+	CPUInfo         []CpuInfo `json:"cpu_info"`
 }
 
 var (
