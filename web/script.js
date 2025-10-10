@@ -9,10 +9,11 @@ function fetchStats() {
         .then(data => {
             document.getElementById('cpu-usage').textContent = data.cpu_usage.toFixed(2);
             // current implementation supports single CPU envs
-            //scope to expand to multi CPU env
-            document.getElementById('cpu-model-name').textContent =  data.cpu_info[0].model;
-            document.getElementById('cpu-cores').textContent =  data.cpu_info[0].cores;
-            document.getElementById('cpu-frequency').textContent =  data.cpu_info[0].maxFrequency;
+            // scope to expand to multi CPU env
+            document.getElementById('cpu-model-name').textContent = data.cpu_info[0].model;
+            document.getElementById('cpu-cores').textContent = data.cpu_info[0].cores;
+            document.getElementById('cpu-frequency').textContent = data.cpu_info[0].maxFrequency;
+
             // Update Memory
             const memUsedGB = (data.mem_used / 1024 / 1024 / 1024).toFixed(2);
             const memTotalGB = (data.mem_total / 1024 / 1024 / 1024).toFixed(2);
@@ -20,8 +21,13 @@ function fetchStats() {
             document.getElementById('mem-total').textContent = memTotalGB;
             document.getElementById('mem-percent').textContent = data.mem_used_percent.toFixed(2);
 
+            
             processesData = data.processes || [];
             renderTables();
+
+            if (data.cpu_per_core_usage) {
+                updatePerCoreUsage(data.cpu_per_core_usage);
+            }
         })
         .catch(error => console.error('Error fetching stats:', error));
 }
@@ -103,6 +109,28 @@ function togglePin(pid) {
         pinnedPids.push(pid);
     }
     renderTables();
+}
+
+function updatePerCoreUsage(perCoreUsage) {
+    const tbody = document.querySelector('#per-core-usage-table tbody');
+    tbody.innerHTML = '';
+
+    if (!perCoreUsage || !Array.isArray(perCoreUsage)) {
+        return;
+    }
+
+    perCoreUsage.forEach((usage, index) => {
+        // Lines for better readability
+        const hashCount = Math.ceil(usage / 10);
+        const visualBar = '#'.repeat(hashCount);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>Core ${index}</td>
+            <td>${usage.toFixed(1)}% ${visualBar}</td>
+        `;
+        tbody.appendChild(row);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
