@@ -1,77 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8"/>
     <title>Go Glances</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css"/>
+  </head>
+  <body>
     <div class="container">
-        <h1>Go Glances</h1>
-        <div class="stats-grid">
-            <div class="stats-card">
-                <h2>CPU</h2>
-                <p>Usage: <span id="cpu-usage">...</span>%</p>
-                <div id = "cpu-info-container">
-                    <h2>Processes (Top 20 by CPU)</h2>
-                    <p>CPU model name: <span id="cpu-model-name">...</span></p>
-                    <p>CPU Cores: <span id="cpu-cores">...</span></p>
-                    <p>CPU Max Frequency: <span id="cpu-frequency">...</span> Mhz</p>
-                </div>
-            </div>
-            <div class="stats-card">
-                <h2>Memory</h2>
-                <p>Used: <span id="mem-used">...</span> / <span id="mem-total">...</span> GB</p>
-                <p>Usage: <span id="mem-percent">...</span>%</p>
-            </div>
+      <h1>Go Glances</h1>
+      <div class="stats-grid">
+        <div class="stats-card">
+          <h2>CPU</h2>
+          <p>Usage: <span id="cpu-usage">...</span>%</p>
+          <div id="cpu-info-container">
+            <h2>Processes (Top 20 by CPU)</h2>
+            <p>CPU model name: <span id="cpu-model-name">...</span></p>
+            <p>CPU Cores: <span id="cpu-cores">...</span></p>
+            <p>CPU Max Frequency: <span id="cpu-frequency">...</span> Mhz</p>
+          </div>
         </div>
-        <div id="pinned-process-container">
-            <h2>Pinned Processes</h2>
-            <table id="pinned-process-table">
-                <thead>
-                    <tr>
-                        <th data-column="cpu">CPU%</th>
-                        <th data-column="memory">MEM%</th>
-                        <th data-column="virt">VIRT</th>
-                        <th data-column="res">RES</th>
-                        <th data-column="pid">PID</th>
-                        <th data-column="username">USER</th>
-                        <th data-column="cpu_time">TIME+</th>
-                        <th data-column="threads">THR</th>
-                        <th data-column="nice">NI</th>
-                        <th data-column="status">S</th>
-                        <th>Command</th>
-                    </tr>
-                </thead>
-                <tbody id="pinned-process-list-body">
-                    <!-- JS will populate this -->
-                </tbody>
-            </table>
+        <div class="stats-card">
+          <h2>Memory</h2>
+          <p>
+            Used: <span id="mem-used">...</span> /
+            <span id="mem-total">...</span> GB
+          </p>
+          <p>Usage: <span id="mem-percent">...</span>%</p>
         </div>
-        <div id="process-container">
-            <h2>Processes</h2>
-            <table id="process-table">
-                <thead>
-                    <tr>
-                        <th data-column="cpu">CPU%</th>
-                        <th data-column="memory">MEM%</th>
-                        <th data-column="virt">VIRT</th>
-                        <th data-column="res">RES</th>
-                        <th data-column="pid">PID</th>
-                        <th data-column="username">USER</th>
-                        <th data-column="cpu_time">TIME+</th>
-                        <th data-column="threads">THR</th>
-                        <th data-column="nice">NI</th>
-                        <th data-column="status">S</th>
-                        <th>Command</th>
-                    </tr>
-                </thead>
-                <tbody id="process-list-body">
-                    <!-- JS will populate this -->
-                </tbody>
-            </table>
-        </div>
+      </div>
+      <div id="per-core-usage-container">
+        <h2>Usage per core</h2>
+        <table id="per-core-usage-table">
+          <thead>
+            <tr>
+              <th>Core</th>
+              <th>Usage (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JS will populate this -->
+          </tbody>
+        </table>
+      </div>
+      <div id="pinned-process-container">
+        <h2>Pinned Processes</h2>
+        <table id="pinned-process-table">
+          <thead>
+            <tr>
+              <th data-column="cpu">CPU%</th>
+              <th data-column="memory">MEM%</th>
+              <th data-column="virt">VIRT</th>
+              <th data-column="res">RES</th>
+              <th data-column="pid">PID</th>
+              <th data-column="username">USER</th>
+              <th data-column="cpu_time">TIME+</th>
+              <th data-column="threads">THR</th>
+              <th data-column="nice">NI</th>
+              <th data-column="status">S</th>
+              <th>Command</th>
+            </tr>
+          </thead>
+          <tbody id="pinned-process-list-body">
+            <!-- JS will populate this -->
+          </tbody>
+        </table>
+      </div>
+      <div id="process-container">
+        <h2>Processes</h2>
+        <table id="process-table">
+          <thead>
+            <tr>
+              <th data-column="cpu">CPU%</th>
+              <th data-column="memory">MEM%</th>
+              <th data-column="virt">VIRT</th>
+              <th data-column="res">RES</th>
+              <th data-column="pid">PID</th>
+              <th data-column="username">USER</th>
+              <th data-column="cpu_time">TIME+</th>
+              <th data-column="threads">THR</th>
+              <th data-column="nice">NI</th>
+              <th data-column="status">S</th>
+              <th>Command</th>
+            </tr>
+          </thead>
+          <tbody id="process-list-body">
+            <!-- JS will populate this -->
+          </tbody>
+        </table>
+      </div>
     </div>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
