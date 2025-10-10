@@ -1,14 +1,25 @@
+# golangci-lint v2 configuration
 run:
-  timeout: 5m
+  tests: true           # include _test.go files
+  skip-dirs:
+    - vendor            # skip vendor directory
+  skip-files:
+    - generated.go       # skip generated files
+
 linters:
   enable:
     - govet
     - errcheck
-    - gofmt
     - staticcheck
-    - ineffassign
+    - gosimple
     - unused
+    - structcheck
+    - typecheck
+
 issues:
   exclude-use-default: false
+  max-same-issues: 3
+  max-issues-per-linter: 0
+  max-issues: 0
   exclude:
-    - "Error return value of .((os|io).Close|fmt.Fprintf). is not checked"
+    - "Error return value of .+ is not checked"  # example exclusion

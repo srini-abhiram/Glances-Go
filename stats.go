@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/shirou/gopsutil/v3/cpu"
-	"github.com/shirou/gopsutil/v3/mem"
-	"github.com/shirou/gopsutil/v3/process"
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 // Process holds information about a single running process
@@ -25,6 +26,13 @@ type Process struct {
 	CPUTime  float64 `json:"cpu_time"`
 }
 
+// CpuInfo holds information about the CPU the application is hosted on
+type CpuInfo struct {
+	CpuModelName string `json:"model"`
+	MaxFrequency int32  `json:"maxFrequency"`
+	Cores        int32  `json:"cores"`
+}
+
 // SystemStats is the main structure for all system metrics
 type SystemStats struct {
 	CPUUsage       float64   `json:"cpu_usage"`
@@ -32,6 +40,7 @@ type SystemStats struct {
 	MemUsed        uint64    `json:"mem_used"`
 	MemUsedPercent float64   `json:"mem_used_percent"`
 	Processes      []Process `json:"processes"`
+	CPUInfo        []CpuInfo `json:"cpu_info"`
 }
 
 var (
@@ -59,6 +68,21 @@ func collectStats() (SystemStats, error) {
 		stats.CPUUsage = cpuPercentages[0]
 	}
 
+	// CPU Info
+	cpuInfoArr, err := cpu.Info()
+	if err != nil {
+		return stats, err
+	}
+	var cpuInfoList []CpuInfo
+	for _, cpu := range cpuInfoArr {
+		cpuInfoList = append(cpuInfoList, CpuInfo{
+			CpuModelName: cpu.ModelName,
+			MaxFrequency: int32(cpu.Mhz),
+			Cores:        int32(cpu.Cores),
+		})
+	}
+	stats.CPUInfo = cpuInfoList
+
 	// Memory Usage
 	vm, err := mem.VirtualMemory()
 	if err != nil {
@@ -73,7 +97,6 @@ func collectStats() (SystemStats, error) {
 	if err != nil {
 		return stats, err
 	}
-
 
 	var wg sync.WaitGroup
 	processChan := make(chan Process, len(pids))

@@ -8,6 +8,12 @@ function fetchStats() {
         .then(response => response.json())
         .then(data => {
             document.getElementById('cpu-usage').textContent = data.cpu_usage.toFixed(2);
+            // current implementation supports single CPU envs
+            //scope to expand to multi CPU env
+            document.getElementById('cpu-model-name').textContent =  data.cpu_info[0].model;
+            document.getElementById('cpu-cores').textContent =  data.cpu_info[0].cores;
+            document.getElementById('cpu-frequency').textContent =  data.cpu_info[0].maxFrequency;
+            // Update Memory
             const memUsedGB = (data.mem_used / 1024 / 1024 / 1024).toFixed(2);
             const memTotalGB = (data.mem_total / 1024 / 1024 / 1024).toFixed(2);
             document.getElementById('mem-used').textContent = memUsedGB;
