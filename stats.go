@@ -2,6 +2,7 @@ package main
 
 import (
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
@@ -11,10 +12,18 @@ import (
 
 // Process holds information about a single running process
 type Process struct {
-	Pid    int32   `json:"pid"`
-	Name   string  `json:"name"`
-	CPU    float64 `json:"cpu"`
-	Memory float32 `json:"memory"`
+	Pid      int32   `json:"pid"`
+	Name     string  `json:"name"`
+	Username string  `json:"username"`
+	CPU      float64 `json:"cpu"`
+	Memory   float32 `json:"memory"`
+	VIRT     uint64  `json:"virt"`
+	RES      uint64  `json:"res"`
+	Threads  int32   `json:"threads"`
+	Status   string  `json:"status"`
+	Cmdline  string  `json:"cmdline"`
+	Nice     int32   `json:"nice"`
+	CPUTime  float64 `json:"cpu_time"`
 }
 
 // CpuInfo holds information about the CPU the application is hosted on
@@ -34,7 +43,20 @@ type SystemStats struct {
 	CPUInfo        []CpuInfo `json:"cpu_info"`
 }
 
+var (
+	statsCache SystemStats
+	cacheMutex sync.Mutex
+	cacheTime  time.Time
+)
+
 func collectStats() (SystemStats, error) {
+	cacheMutex.Lock()
+	defer cacheMutex.Unlock()
+
+	if time.Since(cacheTime) < 2*time.Second {
+		return statsCache, nil
+	}
+
 	var stats SystemStats
 
 	// CPU Usage
@@ -53,14 +75,12 @@ func collectStats() (SystemStats, error) {
 	}
 	var cpuInfoList []CpuInfo
 	for _, cpu := range cpuInfoArr {
-		cpuInfo := CpuInfo{
+		cpuInfoList = append(cpuInfoList, CpuInfo{
 			CpuModelName: cpu.ModelName,
 			MaxFrequency: int32(cpu.Mhz),
 			Cores:        int32(cpu.Cores),
-		}
-		cpuInfoList = append(cpuInfoList, cpuInfo)
+		})
 	}
-
 	stats.CPUInfo = cpuInfoList
 
 	// Memory Usage
@@ -78,22 +98,60 @@ func collectStats() (SystemStats, error) {
 		return stats, err
 	}
 
-	var processes []Process
-	for _, pid := range pids {
-		p, err := process.NewProcess(pid)
-		if err != nil {
-			continue // Skip processes that might have terminated
-		}
-		name, _ := p.Name()
-		cpu, _ := p.CPUPercent()
-		mem, _ := p.MemoryPercent()
+	var wg sync.WaitGroup
+	processChan := make(chan Process, len(pids))
 
-		processes = append(processes, Process{
-			Pid:    pid,
-			Name:   name,
-			CPU:    cpu,
-			Memory: mem,
-		})
+	for _, pid := range pids {
+		wg.Add(1)
+		go func(pid int32) {
+			defer wg.Done()
+			p, err := process.NewProcess(pid)
+			if err != nil {
+				return // Skip processes that might have terminated
+			}
+			name, _ := p.Name()
+			username, _ := p.Username()
+			cpu, _ := p.CPUPercent()
+			mem, _ := p.MemoryPercent()
+			var virt, res uint64
+			memInfo, err := p.MemoryInfo()
+			if err == nil {
+				virt = memInfo.VMS
+				res = memInfo.RSS
+			}
+			threads, _ := p.NumThreads()
+			status, _ := p.Status()
+			cmdline, _ := p.Cmdline()
+			nice, _ := p.Nice()
+			var cpuTime float64
+			cpuTimes, err := p.Times()
+			if err == nil {
+				cpuTime = cpuTimes.User + cpuTimes.System
+			}
+
+			processChan <- Process{
+				Pid:      pid,
+				Name:     name,
+				Username: username,
+				CPU:      cpu,
+				Memory:   mem,
+				VIRT:     virt,
+				RES:      res,
+				Threads:  threads,
+				Status:   status[0],
+				Cmdline:  cmdline,
+				Nice:     nice,
+				CPUTime:  cpuTime,
+			}
+		}(pid)
+	}
+
+	wg.Wait()
+	close(processChan)
+
+	var processes []Process
+	for p := range processChan {
+		processes = append(processes, p)
 	}
 
 	// Sort processes by CPU usage (descending)
@@ -107,6 +165,9 @@ func collectStats() (SystemStats, error) {
 	} else {
 		stats.Processes = processes
 	}
+
+	statsCache = stats
+	cacheTime = time.Now()
 
 	return stats, nil
 }

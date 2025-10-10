@@ -25,15 +25,45 @@
                 <p>Usage: <span id="mem-percent">...</span>%</p>
             </div>
         </div>
+        <div id="pinned-process-container">
+            <h2>Pinned Processes</h2>
+            <table id="pinned-process-table">
+                <thead>
+                    <tr>
+                        <th data-column="cpu">CPU%</th>
+                        <th data-column="memory">MEM%</th>
+                        <th data-column="virt">VIRT</th>
+                        <th data-column="res">RES</th>
+                        <th data-column="pid">PID</th>
+                        <th data-column="username">USER</th>
+                        <th data-column="cpu_time">TIME+</th>
+                        <th data-column="threads">THR</th>
+                        <th data-column="nice">NI</th>
+                        <th data-column="status">S</th>
+                        <th>Command</th>
+                    </tr>
+                </thead>
+                <tbody id="pinned-process-list-body">
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
         <div id="process-container">
-            <h2>Processes (Top 20 by CPU)</h2>
+            <h2>Processes</h2>
             <table id="process-table">
                 <thead>
                     <tr>
-                        <th>PID</th>
-                        <th>Name</th>
-                        <th>CPU %</th>
-                        <th>Mem %</th>
+                        <th data-column="cpu">CPU%</th>
+                        <th data-column="memory">MEM%</th>
+                        <th data-column="virt">VIRT</th>
+                        <th data-column="res">RES</th>
+                        <th data-column="pid">PID</th>
+                        <th data-column="username">USER</th>
+                        <th data-column="cpu_time">TIME+</th>
+                        <th data-column="threads">THR</th>
+                        <th data-column="nice">NI</th>
+                        <th data-column="status">S</th>
+                        <th>Command</th>
                     </tr>
                 </thead>
                 <tbody id="process-list-body">
