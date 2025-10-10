@@ -58,6 +58,12 @@ func collectStats() (SystemStats, error) {
 	}
 
 	var stats SystemStats
+	var coreCount int
+
+	coreCount, err := cpu.Counts(true)
+	if err != nil {
+		return stats, err
+	}
 
 	// CPU Usage
 	cpuPercentages, err := cpu.Percent(time.Second, false)
@@ -78,7 +84,7 @@ func collectStats() (SystemStats, error) {
 		cpuInfoList = append(cpuInfoList, CpuInfo{
 			CpuModelName: cpu.ModelName,
 			MaxFrequency: int32(cpu.Mhz),
-			Cores:        int32(cpu.Cores),
+			Cores:        int32(coreCount),
 		})
 	}
 	stats.CPUInfo = cpuInfoList
