@@ -75,6 +75,19 @@ func collectStats() (SystemStats, error) {
 		stats.CPUUsage = cpuPercentages[0]
 	}
 
+	perCorePercentages, err := cpu.Percent(time.Second, true)
+	if err != nil {
+		return stats, err
+	}
+	stats.CPUPerCoreUsage = perCorePercentages
+
+	if len(perCorePercentages) > 0 {
+		var sum float64
+		for _, v := range perCorePercentages {
+			sum += v
+		}
+		stats.CPUUsage = sum / float64(len(perCorePercentages))
+	}
 	// CPU Info
 	cpuInfoArr, err := cpu.Info()
 	if err != nil {
