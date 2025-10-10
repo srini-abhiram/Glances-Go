@@ -99,3 +99,40 @@ h1 {
 .sort-desc::after {
     content: ' ▼';
 }
+
+#per-core-usage-container {
+    background-color: #252526;
+    padding: 1.5em;
+    border-radius: 4px;
+    margin-bottom: 2em;
+}
+
+#per-core-usage-container h2 {
+    margin-top: 0;
+    color: #9cdcfe; /* Light Blue */
+}
+
+#per-core-usage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+#per-core-usage-table thead {
+    text-align: left;
+    color: #4ec9b0; /* Teal */
+}
+
+#per-core-usage-table th,
+#per-core-usage-table td {
+    padding: 0.6em 0.8em;
+    border-bottom: 1px solid #333;
+}
+
+#per-core-usage-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#per-core-usage-table tbody tr:hover {
+    background-color: #2a523f;
+}
