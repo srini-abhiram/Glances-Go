@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/process"
 )
 
@@ -41,6 +43,11 @@ type SystemStats struct {
 	MemUsedPercent float64   `json:"mem_used_percent"`
 	Processes      []Process `json:"processes"`
 	CPUInfo        []CpuInfo `json:"cpu_info"`
+	PerCoreCPU     []float64 `json:"per_core_cpu"`
+	DiskReadBytes  uint64    `json:"disk_read_bytes"`
+	DiskWriteBytes uint64    `json:"disk_write_bytes"`
+	NetBytesSent   uint64    `json:"net_bytes_sent"`
+	NetBytesRecv   uint64    `json:"net_bytes_recv"`
 }
 
 var (
@@ -165,6 +172,27 @@ func collectStats() (SystemStats, error) {
 	} else {
 		stats.Processes = processes
 	}
+
+	// Disk I/O
+	diskIO, _ := disk.IOCounters()
+	var totalRead, totalWrite uint64
+	for _, io := range diskIO {
+		totalRead += io.ReadBytes
+		totalWrite += io.WriteBytes
+	}
+	stats.DiskReadBytes = totalRead
+	stats.DiskWriteBytes = totalWrite
+
+	// Network I/O
+	netIO, _ := net.IOCounters(false)
+	if len(netIO) > 0 {
+		stats.NetBytesSent = netIO[0].BytesSent
+		stats.NetBytesRecv = netIO[0].BytesRecv
+	}
+
+	// Per-core CPU usage
+	perCore, _ := cpu.Percent(0, true)
+	stats.PerCoreCPU = perCore
 
 	statsCache = stats
 	cacheTime = time.Now()

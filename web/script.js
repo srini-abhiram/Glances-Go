@@ -130,4 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
             togglePin(parseInt(row.dataset.pid, 10));
         }
     });
+
+    document.getElementById("download-csv-btn").addEventListener("click", () => {
+        window.location.href = "/download-csv";
+    });
+
 });
