@@ -99,16 +99,3 @@ h1 {
 .sort-desc::after {
     content: ' ▼';
 }
-
-.btn {
-  background-color: #4ec9b0;
-  color: #1e1e1e;
-  padding: 0.5em 1em;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s, color 0.3s;
-}
-.btn:hover {
-  opacity: 0.9;
-}
