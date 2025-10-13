@@ -15,8 +15,10 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(stats)
-}
+	    err = json.NewEncoder(w).Encode(stats)
+	    if err != nil {
+	        log.Printf("Error encoding stats: %v", err)
+	    }}
 
 func main() {
 	// Serve static files from a 'web' directory
