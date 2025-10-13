@@ -13,19 +13,34 @@
           <h2>CPU</h2>
           <p>Usage: <span id="cpu-usage">...</span>%</p>
           <div id="cpu-info-container">
-            <h2>Processes (Top 20 by CPU)</h2>
             <p>CPU model name: <span id="cpu-model-name">...</span></p>
             <p>CPU Cores: <span id="cpu-cores">...</span></p>
             <p>CPU Max Frequency: <span id="cpu-frequency">...</span> Mhz</p>
           </div>
+
         </div>
         <div class="stats-card">
           <h2>Memory</h2>
           <p>
-            Used: <span id="mem-used">...</span> /
+            Used: <span id="mem-used">...</span> / 
             <span id="mem-total">...</span> GB
           </p>
           <p>Usage: <span id="mem-percent">...</span>%</p>
+        </div>
+        <div class="stats-card network-card">
+          <h2>Network</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Interface</th>
+                <th>Rxps</th>
+                <th>Txps</th>
+              </tr>
+            </thead>
+            <tbody id="network-interfaces-body">
+              <!-- JS will populate this -->
+            </tbody>
+          </table>
         </div>
       </div>
       <div id="per-core-usage-container">
