@@ -28,8 +28,35 @@ function fetchStats() {
             if (data.cpu_per_core_usage) {
                 updatePerCoreUsage(data.cpu_per_core_usage);
             }
+
+            if (data.network) {
+                updateNetworkUsage(data.network);
+            }
         })
         .catch(error => console.error('Error fetching stats:', error));
+}
+
+function updateNetworkUsage(networkData) {
+    const tbody = document.getElementById('network-interfaces-body');
+    tbody.innerHTML = '';
+
+    if (!networkData || !Array.isArray(networkData)) {
+        return;
+    }
+
+    networkData.forEach(interface => {
+        const row = document.createElement('tr');
+        let interfaceName = interface.name;
+        if (interfaceName.length > 20) {
+            interfaceName = interfaceName.substring(0, 20) + '...';
+        }
+        row.innerHTML = `
+            <td title="${interface.name}">${interfaceName}</td>
+            <td>${interface.rx_speed.toFixed(0)} ${interface.rx_unit}</td>
+            <td>${interface.tx_speed.toFixed(0)} ${interface.tx_unit}</td>
+        `;
+        tbody.appendChild(row);
+    });
 }
 
 function renderTables() {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/process"
 )
 
@@ -33,21 +34,35 @@ type CpuInfo struct {
 	Cores        int32  `json:"cores"`
 }
 
+// NetworkInterface holds information about a single network interface
+type NetworkInterface struct {
+	Name      string  `json:"name"`
+	Rx        uint64  `json:"rx"`
+	Tx        uint64  `json:"tx"`
+	RxSpeed   float64 `json:"rx_speed"`
+	TxSpeed   float64 `json:"tx_speed"`
+	RxUnit    string  `json:"rx_unit"`
+	TxUnit    string  `json:"tx_unit"`
+}
+
 // SystemStats is the main structure for all system metrics
 type SystemStats struct {
-	CPUUsage        float64   `json:"cpu_usage"`
-	CPUPerCoreUsage []float64 `json:"cpu_per_core_usage"`
-	MemTotal        uint64    `json:"mem_total"`
-	MemUsed         uint64    `json:"mem_used"`
-	MemUsedPercent  float64   `json:"mem_used_percent"`
-	Processes       []Process `json:"processes"`
-	CPUInfo         []CpuInfo `json:"cpu_info"`
+	CPUUsage        float64            `json:"cpu_usage"`
+	CPUPerCoreUsage []float64          `json:"cpu_per_core_usage"`
+	MemTotal        uint64             `json:"mem_total"`
+	MemUsed         uint64             `json:"mem_used"`
+	MemUsedPercent  float64            `json:"mem_used_percent"`
+	Processes       []Process          `json:"processes"`
+	CPUInfo         []CpuInfo          `json:"cpu_info"`
+	Network         []NetworkInterface `json:"network"`
 }
 
 var (
-	statsCache SystemStats
-	cacheMutex sync.Mutex
-	cacheTime  time.Time
+	statsCache         SystemStats
+	cacheMutex         sync.Mutex
+	cacheTime          time.Time
+	lastNetStats       []net.IOCountersStat
+	lastNetStatsTime   time.Time
 )
 
 func collectStats() (SystemStats, error) {
@@ -184,6 +199,40 @@ func collectStats() (SystemStats, error) {
 		stats.Processes = processes[:20]
 	} else {
 		stats.Processes = processes
+	}
+
+	// Network Stats
+	netStats, err := net.IOCounters(true)
+	if err == nil {
+		currentTime := time.Now()
+		duration := currentTime.Sub(lastNetStatsTime).Seconds()
+
+		if lastNetStats != nil && duration > 0 {
+			for _, current := range netStats {
+				for _, last := range lastNetStats {
+					if current.Name == last.Name {
+						ni := NetworkInterface{
+							Name:   current.Name,
+							Rx:     current.BytesRecv,
+							Tx:     current.BytesSent,
+							RxUnit: "Kb",
+							TxUnit: "Kb",
+						}
+						if current.BytesRecv > last.BytesRecv {
+							ni.RxSpeed = float64(current.BytesRecv-last.BytesRecv) / duration / 1024
+						}
+						if current.BytesSent > last.BytesSent {
+							ni.TxSpeed = float64(current.BytesSent-last.BytesSent) / duration / 1024
+						}
+						stats.Network = append(stats.Network, ni)
+						break
+					}
+				}
+			}
+		}
+
+		lastNetStats = netStats
+		lastNetStatsTime = currentTime
 	}
 
 	statsCache = stats
