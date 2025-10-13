@@ -36,13 +36,13 @@ type CpuInfo struct {
 
 // NetworkInterface holds information about a single network interface
 type NetworkInterface struct {
-	Name      string  `json:"name"`
-	Rx        uint64  `json:"rx"`
-	Tx        uint64  `json:"tx"`
-	RxSpeed   float64 `json:"rx_speed"`
-	TxSpeed   float64 `json:"tx_speed"`
-	RxUnit    string  `json:"rx_unit"`
-	TxUnit    string  `json:"tx_unit"`
+	Name    string  `json:"name"`
+	Rx      uint64  `json:"rx"`
+	Tx      uint64  `json:"tx"`
+	RxSpeed float64 `json:"rx_speed"`
+	TxSpeed float64 `json:"tx_speed"`
+	RxUnit  string  `json:"rx_unit"`
+	TxUnit  string  `json:"tx_unit"`
 }
 
 // SystemStats is the main structure for all system metrics
@@ -58,18 +58,18 @@ type SystemStats struct {
 }
 
 var (
-	statsCache         SystemStats
-	cacheMutex         sync.Mutex
-	cacheTime          time.Time
-	lastNetStats       []net.IOCountersStat
-	lastNetStatsTime   time.Time
+	statsCache       SystemStats
+	cacheMutex       sync.Mutex
+	cacheTime        time.Time
+	lastNetStats     []net.IOCountersStat
+	lastNetStatsTime time.Time
 )
 
-func collectStats() (SystemStats, error) {
+func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error) {
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()
 
-	if time.Since(cacheTime) < 2*time.Second {
+	if time.Since(cacheTime) < cacheTTL {
 		return statsCache, nil
 	}
 
@@ -194,9 +194,9 @@ func collectStats() (SystemStats, error) {
 		return processes[i].CPU > processes[j].CPU
 	})
 
-	// Limit to top 20 processes
-	if len(processes) > 20 {
-		stats.Processes = processes[:20]
+	// Limit to top maxProcesses processes
+	if len(processes) > maxProcesses {
+		stats.Processes = processes[:maxProcesses]
 	} else {
 		stats.Processes = processes
 	}
