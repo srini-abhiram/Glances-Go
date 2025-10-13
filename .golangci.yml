@@ -1,25 +1,41 @@
-# golangci-lint v2 configuration
+version: "2"
+
 run:
-  tests: true           # include _test.go files
-  skip-dirs:
-    - vendor            # skip vendor directory
-  skip-files:
-    - generated.go       # skip generated files
+  timeout: 5m
 
 linters:
   enable:
     - govet
-    - errcheck
     - staticcheck
-    - gosimple
+    - errcheck
+    #- gosimple
     - unused
-    - structcheck
-    - typecheck
-
-issues:
-  exclude-use-default: false
-  max-same-issues: 3
-  max-issues-per-linter: 0
-  max-issues: 0
-  exclude:
-    - "Error return value of .+ is not checked"  # example exclusion
+  disable:
+    - depguard
+    #- exhaustivestruct
+    - funlen
+    - gochecknoglobals
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    #- goerr113
+    # - gofumpt   ❌ removed
+    #- goimports
+    #- golint
+    #- gomnd
+    - gosec
+    - lll
+    #- maligned
+    - misspell
+    - nakedret
+    - nestif
+    - nlreturn
+    - prealloc
+    - predeclared
+    - testpackage
+    - unparam
+    - whitespace
+    - wrapcheck
+    - wsl

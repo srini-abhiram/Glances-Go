@@ -1,0 +1,23 @@
+name: Go Lint
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          # Linter requires no cache
+          cache: false
+
+      - uses: golangci/golangci-lint-action@v8
+        with:
+          args: --timeout 3m --verbose --new-from-rev=origin/master
