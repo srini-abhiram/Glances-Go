@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -17,7 +18,8 @@ type CSVExporter struct {
 func NewCSVExporter(path string) *CSVExporter {
 	f, err := os.Create(path)
 	if err != nil {
-		panic(err)
+		log.Printf("Error creating CSV file %s: %v", path, err)
+		return nil
 	}
 
 	w := csv.NewWriter(f)

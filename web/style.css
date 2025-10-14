@@ -27,6 +27,7 @@ h1 {
 
 .stats-card {
     background-color: #252526;
+
     padding: 1.5em;
     border-radius: 4px;
     border-left: 4px solid #4ec9b0; /* Teal accent */
@@ -100,14 +101,28 @@ h1 {
     content: ' ▼';
 }
 
-.btn {
+.header-bar {
+  display: flex;
+  justify-content: flex-start;  
+  align-items: center;
+  gap: 1rem;                     
+  margin-bottom: 2em;
+}
+
+.download-csv {
+  display: inline-block;
+  background: none;
+  border: 2px solid #4ec9b0;
+  color: #4ec9b0;
+  padding: 0.5em 1em;
+  border-radius: 6px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.download-csv:hover {
   background-color: #4ec9b0;
   color: #1e1e1e;
-  padding: 0.5em 1em;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: bold;
-}
-.btn:hover {
-  opacity: 0.9;
 }

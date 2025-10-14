@@ -30,7 +30,10 @@ func main() {
 	http.HandleFunc("/stats", statsHandler)
 
 	log.Printf("[INFO] CSV export active → writing to %s\n", exportPath)
-	exporter := NewCSVExporter(exportPath)
+	exporter := NewCSVExporter("metrics.csv")
+	if exporter == nil {
+		log.Println("CSV exporter disabled due to initialization error.")
+	}
 	go func() {
 		for {
 			stats, err := collectStats()

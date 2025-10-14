@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"sort"
 	"sync"
 	"time"
@@ -175,25 +176,33 @@ func collectStats() (SystemStats, error) {
 
 	// Disk I/O
 	diskIO, _ := disk.IOCounters()
-	var totalRead, totalWrite uint64
-	for _, io := range diskIO {
-		totalRead += io.ReadBytes
-		totalWrite += io.WriteBytes
+	if err != nil {
+		log.Printf("Error collecting disk IO counters: %v", err)
+	} else {
+		var totalRead, totalWrite uint64
+		for _, io := range diskIO {
+			totalRead += io.ReadBytes
+			totalWrite += io.WriteBytes
+		}
+		stats.DiskReadBytes = totalRead
+		stats.DiskWriteBytes = totalWrite
 	}
-	stats.DiskReadBytes = totalRead
-	stats.DiskWriteBytes = totalWrite
-
 	// Network I/O
 	netIO, _ := net.IOCounters(false)
-	if len(netIO) > 0 {
+	if err != nil {
+		log.Printf("Error collecting network IO counters: %v", err)
+	} else if len(netIO) > 0 {
 		stats.NetBytesSent = netIO[0].BytesSent
 		stats.NetBytesRecv = netIO[0].BytesRecv
 	}
 
 	// Per-core CPU usage
 	perCore, _ := cpu.Percent(0, true)
-	stats.PerCoreCPU = perCore
-
+	if err != nil {
+		log.Printf("Error collecting per-core CPU percent: %v", err)
+	} else {
+		stats.PerCoreCPU = perCore
+	}
 	statsCache = stats
 	cacheTime = time.Now()
 
