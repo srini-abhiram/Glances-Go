@@ -32,8 +32,35 @@ function fetchStats() {
             if (data.network) {
                 updateNetworkUsage(data.network);
             }
+
+            if (data.filesystems) {
+                updateFileSystemUsage(data.filesystems);
+            }
         })
         .catch(error => console.error('Error fetching stats:', error));
+}
+
+function updateFileSystemUsage(fsData) {
+    const tbody = document.getElementById('fs-body');
+    tbody.innerHTML = '';
+
+    if (!fsData || fsData.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="4">No file systems found.</td>`;
+        tbody.appendChild(row);
+        return;
+    }
+
+    fsData.forEach(fs => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${fs.mountpoint}</td>
+            <td>${(fs.used / 1e9).toFixed(2)} GB</td>
+            <td>${(fs.total / 1e9).toFixed(2)} GB</td>
+            <td>${fs.used_perc.toFixed(2)}%</td>
+        `;
+        tbody.appendChild(row);
+    });
 }
 
 function updateNetworkUsage(networkData) {
