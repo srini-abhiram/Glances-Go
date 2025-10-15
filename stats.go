@@ -82,14 +82,6 @@ func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error)
 	}
 
 	// CPU Usage
-	cpuPercentages, err := cpu.Percent(time.Second, false)
-	if err != nil {
-		return stats, err
-	}
-	if len(cpuPercentages) > 0 {
-		stats.CPUUsage = cpuPercentages[0]
-	}
-
 	perCorePercentages, err := cpu.Percent(time.Second, true)
 	if err != nil {
 		return stats, err
