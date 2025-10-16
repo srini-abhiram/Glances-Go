@@ -213,3 +213,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Function to copy text to clipboard
+async function copyToClipboard(text, element) {
+    // Store the element's original title attribute for restoration
+    const originalTitle = element.title || 'Click to copy'; 
+
+    try {
+        await navigator.clipboard.writeText(text);
+        
+        // Provide visual feedback: add 'copied' class and update tooltip
+        element.classList.add('copied');
+        element.title = 'Copied!'; 
+
+        // Remove visual feedback and restore original title after a delay
+        setTimeout(() => {
+            element.classList.remove('copied');
+            element.title = originalTitle;
+        }, 1500); // Feedback visible for 1.5 seconds
+
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+        // Provide error feedback: alert the user
+        alert('Failed to copy. Please ensure clipboard access is granted and try again.');
+        // Optional: Could add a temporary error class for styling, e.g.:
+        // element.classList.add('copy-error');
+        // setTimeout(() => { element.classList.remove('copy-error'); }, 2000);
+        // In such a case, remember to restore the original title as well.
+    }
+}
+
+// Add event listeners after the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // IDs of the elements that should have click-to-copy functionality
+    const copyableElementIds = ['os-info', 'uptime-info', 'system-time'];
+
+    // Iterate over the IDs and attach event listeners
+    copyableElementIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            // Add click event listener to copy content
+            element.addEventListener('click', () => {
+                copyToClipboard(element.textContent, element);
+            });
+
+            // Ensure visual cues are present for clickability, if not already set by HTML/CSS
+            if (!element.style.cursor) {
+                element.style.cursor = 'pointer'; // Change cursor on hover
+            }
+            if (!element.title) {
+                element.title = 'Click to copy'; // Add initial tooltip
+            }
+        }
+    });
+});
