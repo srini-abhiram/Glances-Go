@@ -42,8 +42,23 @@
             </tbody>
           </table>
         </div>
-      </div>
-      <div id="per-core-usage-container">
+        <div class="stats-card fs-card">
+          <h2>File System</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Mount</th>
+                <th>Used</th>
+                <th>Total</th>
+                <th>Used %</th>
+              </tr>
+            </thead>
+            <tbody id="fs-body">
+              <!-- JS will populate this -->
+            </tbody>
+          </table>
+        </div>
+      </div>      <div id="per-core-usage-container">
         <h2>Usage per core</h2>
         <table id="per-core-usage-table">
           <thead>

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/process"
@@ -45,6 +46,14 @@ type NetworkInterface struct {
 	TxUnit  string  `json:"tx_unit"`
 }
 
+// FileSystemStat holds information about a single mounted file system
+type FileSystemStat struct {
+	Mountpoint string  `json:"mountpoint"`
+	Used       uint64  `json:"used"`
+	Total      uint64  `json:"total"`
+	UsedPerc   float64 `json:"used_perc"`
+}
+
 // SystemStats is the main structure for all system metrics
 type SystemStats struct {
 	CPUUsage        float64            `json:"cpu_usage"`
@@ -55,6 +64,7 @@ type SystemStats struct {
 	Processes       []Process          `json:"processes"`
 	CPUInfo         []CpuInfo          `json:"cpu_info"`
 	Network         []NetworkInterface `json:"network"`
+	FileSystems     []FileSystemStat   `json:"filesystems"`
 }
 
 var (
@@ -225,6 +235,22 @@ func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error)
 
 		lastNetStats = netStats
 		lastNetStatsTime = currentTime
+	}
+
+	// File System Stats
+	partitions, err := disk.Partitions(true)
+	if err == nil {
+		for _, p := range partitions {
+			usage, err := disk.Usage(p.Mountpoint)
+			if err == nil {
+				stats.FileSystems = append(stats.FileSystems, FileSystemStat{
+					Mountpoint: usage.Path,
+					Used:       usage.Used,
+					Total:      usage.Total,
+					UsedPerc:   usage.UsedPercent,
+				})
+			}
+		}
 	}
 
 	statsCache = stats
