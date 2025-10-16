@@ -18,6 +18,12 @@ h1 {
     margin-bottom: 2em;
 }
 
+#system-info-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

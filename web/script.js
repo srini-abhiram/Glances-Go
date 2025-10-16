@@ -3,6 +3,28 @@ let sortColumn = 'cpu';
 let sortAsc = false;
 let pinnedPids = [];
 
+function formatUptime(seconds) {
+    const d = Math.floor(seconds / (3600*24));
+    const h = Math.floor(seconds % (3600*24) / 3600);
+    const m = Math.floor(seconds % 3600 / 60);
+    const s = Math.floor(seconds % 60);
+
+    let result = '';
+    if (d > 0) {
+        result += `${d}d `;
+    }
+    if (h > 0) {
+        result += `${h}h `;
+    }
+    if (m > 0) {
+        result += `${m}m `;
+    }
+    if (s > 0) {
+        result += `${s}s`;
+    }
+    return result;
+}
+
 function fetchStats() {
     fetch('/stats')
         .then(response => response.json())
@@ -21,7 +43,13 @@ function fetchStats() {
             document.getElementById('mem-total').textContent = memTotalGB;
             document.getElementById('mem-percent').textContent = data.mem_used_percent.toFixed(2);
 
-            
+            // Update OS, Uptime and System Time
+            document.getElementById('os-distro').textContent = data.os.distro;
+            document.getElementById('os-name').textContent = data.os.name;
+            document.getElementById('os-arch').textContent = data.os.architecture;
+            document.getElementById('system-time').textContent = new Date().toLocaleTimeString();
+            document.getElementById('uptime').textContent = formatUptime(data.uptime);
+
             processesData = data.processes || [];
             renderTables();
 
