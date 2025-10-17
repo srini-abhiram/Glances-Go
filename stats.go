@@ -1,12 +1,14 @@
 package main
 
 import (
+	"runtime"
 	"sort"
 	"sync"
 	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/process"
@@ -54,6 +56,12 @@ type FileSystemStat struct {
 	UsedPerc   float64 `json:"used_perc"`
 }
 
+type OSInfo struct {
+	Name         string `json:"name"`
+	Architecture string `json:"architecture"`
+	Distro       string `json:"distro"`
+}
+
 // SystemStats is the main structure for all system metrics
 type SystemStats struct {
 	CPUUsage        float64            `json:"cpu_usage"`
@@ -65,6 +73,8 @@ type SystemStats struct {
 	CPUInfo         []CpuInfo          `json:"cpu_info"`
 	Network         []NetworkInterface `json:"network"`
 	FileSystems     []FileSystemStat   `json:"filesystems"`
+	OS              OSInfo             `json:"os"`
+	Uptime          uint64             `json:"uptime"`
 }
 
 var (
@@ -129,6 +139,17 @@ func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error)
 	stats.MemUsed = vm.Used
 	stats.MemUsedPercent = vm.UsedPercent
 
+	// OS and Uptime
+	stats.OS.Name = runtime.GOOS
+	stats.OS.Architecture = runtime.GOARCH
+	platform, _, _, err := host.PlatformInformation()
+	if err == nil {
+		stats.OS.Distro = platform
+	}
+	uptime, err := host.Uptime()
+	if err == nil {
+		stats.Uptime = uptime
+	}
 	// Process List
 	pids, err := process.Pids()
 	if err != nil {
