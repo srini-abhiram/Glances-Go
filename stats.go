@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"runtime"
 	"sort"
 	"sync"
@@ -78,12 +79,27 @@ type SystemStats struct {
 }
 
 var (
-	statsCache       SystemStats
-	cacheMutex       sync.Mutex
-	cacheTime        time.Time
-	lastNetStats     []net.IOCountersStat
-	lastNetStatsTime time.Time
+	statsCache        SystemStats
+	cacheMutex        sync.Mutex
+	cacheTime         time.Time
+	lastNetStats      []net.IOCountersStat
+	lastNetStatsTime  time.Time
+	loggedErrors      = make(map[int32]bool)
+	loggedErrorsMutex sync.Mutex
 )
+
+// logProcessError logs an error for a given process ID and metric.
+// It ensures that errors for a specific process are logged only once
+// to avoid flooding the logs with repetitive messages.
+// It uses a mutex to safely access the global loggedErrors map from multiple goroutines.
+func logProcessError(pid int32, err error, metric string) {
+	loggedErrorsMutex.Lock()
+	defer loggedErrorsMutex.Unlock()
+	if !loggedErrors[pid] {
+		log.Printf("[Process] Could not get %s for pid %d: %v. Try running with elevated privileges.", metric, pid, err)
+		loggedErrors[pid] = true
+	}
+}
 
 func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error) {
 	cacheMutex.Lock()
@@ -165,26 +181,70 @@ func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error)
 			defer wg.Done()
 			p, err := process.NewProcess(pid)
 			if err != nil {
-				return // Skip processes that might have terminated
+				logProcessError(pid, err, "new process")
+				return
 			}
-			name, _ := p.Name()
-			username, _ := p.Username()
-			cpu, _ := p.CPUPercent()
-			mem, _ := p.MemoryPercent()
+
+			name, err := p.Name()
+			if err != nil {
+				logProcessError(pid, err, "name")
+			}
+
+			username, err := p.Username()
+			if err != nil {
+				logProcessError(pid, err, "username")
+			}
+
+			cpu, err := p.CPUPercent()
+			if err != nil {
+				logProcessError(pid, err, "cpu percent")
+			}
+
+			mem, err := p.MemoryPercent()
+			if err != nil {
+				logProcessError(pid, err, "memory percent")
+			}
+
 			var virt, res uint64
 			memInfo, err := p.MemoryInfo()
-			if err == nil {
+			if err != nil {
+				logProcessError(pid, err, "memory info")
+			} else {
 				virt = memInfo.VMS
 				res = memInfo.RSS
 			}
-			threads, _ := p.NumThreads()
-			status, _ := p.Status()
-			cmdline, _ := p.Cmdline()
-			nice, _ := p.Nice()
+
+			threads, err := p.NumThreads()
+			if err != nil {
+				logProcessError(pid, err, "thread count")
+			}
+
+			status, err := p.Status()
+			if err != nil {
+				logProcessError(pid, err, "status")
+			}
+
+			cmdline, err := p.Cmdline()
+			if err != nil {
+				logProcessError(pid, err, "cmdline")
+			}
+
+			nice, err := p.Nice()
+			if err != nil {
+				logProcessError(pid, err, "nice")
+			}
+
 			var cpuTime float64
 			cpuTimes, err := p.Times()
-			if err == nil {
+			if err != nil {
+				logProcessError(pid, err, "cpu times")
+			} else {
 				cpuTime = cpuTimes.User + cpuTimes.System
+			}
+
+			var statusStr string
+			if len(status) > 0 {
+				statusStr = status[0]
 			}
 
 			processChan <- Process{
@@ -196,7 +256,7 @@ func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error)
 				VIRT:     virt,
 				RES:      res,
 				Threads:  threads,
-				Status:   status[0],
+				Status:   statusStr,
 				Cmdline:  cmdline,
 				Nice:     nice,
 				CPUTime:  cpuTime,
@@ -226,7 +286,9 @@ func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error)
 
 	// Network Stats
 	netStats, err := net.IOCounters(true)
-	if err == nil {
+	if err != nil {
+		log.Printf("[Network] Could not get network stats: %v", err)
+	} else {
 		currentTime := time.Now()
 		duration := currentTime.Sub(lastNetStatsTime).Seconds()
 
@@ -260,17 +322,21 @@ func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error)
 
 	// File System Stats
 	partitions, err := disk.Partitions(true)
-	if err == nil {
+	if err != nil {
+		log.Printf("[Disk] Could not get disk partitions: %v", err)
+	} else {
 		for _, p := range partitions {
 			usage, err := disk.Usage(p.Mountpoint)
-			if err == nil {
-				stats.FileSystems = append(stats.FileSystems, FileSystemStat{
-					Mountpoint: usage.Path,
-					Used:       usage.Used,
-					Total:      usage.Total,
-					UsedPerc:   usage.UsedPercent,
-				})
+			if err != nil {
+				log.Printf("[Disk] Could not get disk usage for %s: %v", p.Mountpoint, err)
+				continue
 			}
+			stats.FileSystems = append(stats.FileSystems, FileSystemStat{
+				Mountpoint: usage.Path,
+				Used:       usage.Used,
+				Total:      usage.Total,
+				UsedPerc:   usage.UsedPercent,
+			})
 		}
 	}
 
