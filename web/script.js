@@ -4,9 +4,9 @@ let sortAsc = false;
 let pinnedPids = [];
 
 function formatUptime(seconds) {
-    const d = Math.floor(seconds / (3600*24));
-    const h = Math.floor(seconds % (3600*24) / 3600);
-    const m = Math.floor(seconds % 3600 / 60);
+    const d = Math.floor(seconds / (3600 * 24));
+    const h = Math.floor((seconds % (3600 * 24)) / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
 
     let result = '';
@@ -25,11 +25,32 @@ function formatUptime(seconds) {
     return result;
 }
 
+function updateUsageBar(barId, percentage) {
+    const bar = document.getElementById(barId);
+    if (!bar) return;
+
+    bar.style.width = `${percentage}%`;
+
+    // Remove existing classes
+    bar.classList.remove('high-usage', 'medium-usage');
+
+    // Add appropriate class based on usage level
+    if (percentage >= 80) {
+        bar.classList.add('high-usage');
+    } else if (percentage >= 50) {
+        bar.classList.add('medium-usage');
+    }
+}
+
 function fetchStats() {
     fetch('/stats')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('cpu-usage').textContent = data.cpu_usage.toFixed(2);
+            // Update CPU
+            const cpuUsage = data.cpu_usage.toFixed(2);
+            document.getElementById('cpu-usage').textContent = cpuUsage;
+            updateUsageBar('cpu-usage-bar', data.cpu_usage);
+
             // current implementation supports single CPU envs
             // scope to expand to multi CPU env
             document.getElementById('cpu-model-name').textContent = data.cpu_info[0].model;
@@ -42,6 +63,7 @@ function fetchStats() {
             document.getElementById('mem-used').textContent = memUsedGB;
             document.getElementById('mem-total').textContent = memTotalGB;
             document.getElementById('mem-percent').textContent = data.mem_used_percent.toFixed(2);
+            updateUsageBar('mem-usage-bar', data.mem_used_percent);
 
             // Update OS, Uptime and System Time
             document.getElementById('os-distro').textContent = data.os.distro;
@@ -202,14 +224,27 @@ function updatePerCoreUsage(perCoreUsage) {
     }
 
     perCoreUsage.forEach((usage, index) => {
-        // Lines for better readability
-        const hashCount = Math.ceil(usage / 10);
-        const visualBar = '#'.repeat(hashCount);
-
         const row = document.createElement('tr');
+        const usagePercent = usage.toFixed(1);
+
+        // Determine color class based on usage
+        let barClass = '';
+        if (usage >= 80) {
+            barClass = 'high-usage';
+        } else if (usage >= 50) {
+            barClass = 'medium-usage';
+        }
+
         row.innerHTML = `
             <td>Core ${index}</td>
-            <td>${usage.toFixed(1)}% ${visualBar}</td>
+            <td>
+                <div class="core-usage-container">
+                    <span class="core-usage-text">${usagePercent}%</span>
+                    <div class="core-usage-bar-bg">
+                        <div class="core-usage-bar ${barClass}" style="width: ${usage}%"></div>
+                    </div>
+                </div>
+            </td>
         `;
         tbody.appendChild(row);
     });
