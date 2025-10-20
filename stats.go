@@ -80,7 +80,7 @@ type SystemStats struct {
 
 var (
 	statsCache        SystemStats
-	cacheMutex        sync.Mutex
+	cacheMutex        sync.RWMutex
 	cacheTime         time.Time
 	lastNetStats      []net.IOCountersStat
 	lastNetStatsTime  time.Time
@@ -102,6 +102,13 @@ func logProcessError(pid int32, err error, metric string) {
 }
 
 func collectStats(cacheTTL time.Duration, maxProcesses int) (SystemStats, error) {
+	cacheMutex.RLock()
+	if time.Since(cacheTime) < cacheTTL {
+		defer cacheMutex.RUnlock()
+		return statsCache, nil
+	}
+	cacheMutex.RUnlock()
+
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()
 
