@@ -52,7 +52,7 @@ func main() {
 	http.HandleFunc("/stats", statsHandler(cacheTTL, maxProcesses))
 
 	addr := ":" + port
-	log.Printf("Starting server on %s...\n", addr)
+	log.Printf("Starting server on http://localhost%s\n", addr)
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal(err)
