@@ -33,6 +33,10 @@
     "process_thread": "THR",
     "process_nice": "NI",
     "process_status": "S",
-    "process_command": "Command"
+    "process_command": "Command",
+    "uptime_day": "{{count}}d",
+    "uptime_hour": "{{count}}h",
+    "uptime_minute": "{{count}}m",
+    "uptime_second": "{{count}}s"
     
 }

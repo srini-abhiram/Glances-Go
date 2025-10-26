@@ -34,25 +34,27 @@ function updateLanguage() {
 }
 
 function formatUptime(seconds) {
+
     const d = Math.floor(seconds / (3600 * 24));
     const h = Math.floor((seconds % (3600 * 24)) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
 
-    let result = '';
+    const result = [];
+    
     if (d > 0) {
-        result += `${d}d `;
+        result.push(i18next.t('uptime_day', {count: d}));
     }
     if (h > 0) {
-        result += `${h}h `;
+        result.push(i18next.t('uptime_hour', {count: h}));
     }
     if (m > 0) {
-        result += `${m}m `;
+        result.push(i18next.t('uptime_minute', {count: m}));
     }
     if (s > 0) {
-        result += `${s}s`;
+        result.push(i18next.t('uptime_second', {count: s}));
     }
-    return result;
+    return result.join(' ');
 }
 
 function updateUsageBar(barId, percentage) {

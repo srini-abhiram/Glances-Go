@@ -33,6 +33,10 @@
     "process_thread": "스레드 수",
     "process_nice": "우선순위",
     "process_status": "상태",
-    "process_command": "프로세스명"
+    "process_command": "프로세스명",
+    "uptime_day": "{{count}}일",
+    "uptime_hour": "{{count}}시간",
+    "uptime_minute": "{{count}}분",
+    "uptime_second": "{{count}}초"
 
 }
