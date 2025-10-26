@@ -3,6 +3,30 @@ let sortColumn = 'cpu';
 let sortAsc = false;
 let pinnedPids = [];
 
+i18next
+    .use(i18nextHttpBackend)
+    .use(i18nextBrowserLanguageDetector)
+    .init({
+        load: 'languageOnly',
+        fallbackLng: 'en',
+        detection: { order: ["navigator"] },
+        backend: {
+            loadPath: '/locales/{{lng}}.json'
+        },
+        debug: true
+    }, (err, t) => {
+        if (err) return console.log('something went wrong loading', err);
+        updateContent();
+    }); 
+
+function updateContent() {
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        element.innerHTML = i18next.t(key);
+    });
+}
+
+
 function formatUptime(seconds) {
     const d = Math.floor(seconds / (3600 * 24));
     const h = Math.floor((seconds % (3600 * 24)) / 3600);

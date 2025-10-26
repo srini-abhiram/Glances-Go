@@ -83,9 +83,16 @@ h1 {
     font-size: 0.9em;
 }
 
-.stats-card span {
+
+.stats-card .value { /* this part will display the stat card's value */
     font-weight: bold;
     color: #b5cea8; /* Green */
+}
+
+.stats-card .label { /* this part will display the stat card's label */
+    font-weight: normal; 
+    color: #d4d4d4; 
+    margin-right: 0.5em; 
 }
 
 .usage-bar-container {
