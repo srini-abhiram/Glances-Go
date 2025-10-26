@@ -13,7 +13,7 @@
     "interface": "interface",
     "rxps": "Rxps",
     "txps": "Txps",
-    "file_system": "File_System",
+    "file_system": "File System",
     "mount": "Mount",
     "disk_used": "Used",
     "disk_total": "Total",

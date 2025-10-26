@@ -26,6 +26,12 @@ function updateContent() {
     });
 }
 
+function updateLanguage() {
+    const selector = document.getElementById('language-selector');
+    if (selector) {
+        selector.value = i18next.language;
+    }
+}
 
 function formatUptime(seconds) {
     const d = Math.floor(seconds / (3600 * 24));
@@ -277,6 +283,17 @@ function updatePerCoreUsage(perCoreUsage) {
 document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
     setInterval(fetchStats, 2000);
+
+    const selector = document.getElementById('language-selector');
+    if(selector) {
+        selector.addEventListener('change', (event) => {
+            const chosenLng = event.target.value;
+            i18next.changeLanguage(chosenLng, (err, t) => {
+                if (err) return console.error('An error has occurred while changing language', err);
+                updateContent();
+            });
+        });
+    }
 
     document.querySelectorAll('#process-table thead th').forEach(header => {
         const column = header.dataset.column;

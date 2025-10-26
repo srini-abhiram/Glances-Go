@@ -257,3 +257,20 @@ h1 {
 .core-usage-bar.medium-usage {
     background: linear-gradient(90deg, #dcdcaa, #d7ba7d);
 }
+
+
+.language-selector-container {
+    text-align: right;
+    margin-bottom: 1em;
+}
+
+
+#language-selector {
+    background-color: #252526; 
+    color: #d4d4d4; 
+    border: 1px solid #333;
+    padding: 0.5em;
+    border-radius: 4px;
+    font-family: inherit; 
+    cursor: pointer;
+}
