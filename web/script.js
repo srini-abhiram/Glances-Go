@@ -2,6 +2,8 @@ let processesData = [];
 let sortColumn = 'cpu';
 let sortAsc = false;
 let pinnedPids = [];
+let autoRefreshInterval;
+let autoRefreshEnabled = true;
 
 function formatUptime(seconds) {
     const d = Math.floor(seconds / (3600 * 24));
@@ -44,7 +46,12 @@ function updateUsageBar(barId, percentage) {
 
 function fetchStats() {
     fetch('/stats')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             // Update CPU
             const cpuUsage = data.cpu_usage.toFixed(2);
@@ -252,7 +259,32 @@ function updatePerCoreUsage(perCoreUsage) {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
-    setInterval(fetchStats, 2000);
+
+    const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
+    if (autoRefreshToggle) {
+        autoRefreshToggle.checked = autoRefreshEnabled;
+
+        if (autoRefreshEnabled) {
+            startAutoRefresh();
+        }
+
+        autoRefreshToggle.addEventListener('change', function () {
+            autoRefreshEnabled = this.checked;
+            if (autoRefreshEnabled) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        });
+    }
+
+    const refreshButton = document.getElementById('refresh-button');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', () => {
+            fetchStats();
+            console.log("Manual refresh triggered.");
+        });
+    }
 
     document.querySelectorAll('#process-table thead th').forEach(header => {
         const column = header.dataset.column;
@@ -276,3 +308,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+/**
+ * Starts the auto-refresh interval for fetching statistics.
+ */
+function startAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+    autoRefreshInterval = setInterval(fetchStats, 2000);
+    console.log("Auto-refresh started.");
+}
+
+/**
+ * Stops the auto-refresh interval.
+ */
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+        console.log("Auto-refresh stopped.");
+    }
+}
