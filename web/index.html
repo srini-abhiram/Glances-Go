@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <script src="https://unpkg.com/i18next/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-http-backend/i18nextHttpBackend.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
     <meta charset="UTF-8" />
     <title>Go Glances</title>
     <link rel="stylesheet" href="style.css" />
@@ -9,12 +12,20 @@
 
 <body>
     <div class="container">
+
         <div id="system-info-container">
-            <p>OS: <span id="os-distro">...</span> (<span id="os-name">...</span> <span id="os-arch">...</span>)</p>
-            <p>System Time: <span id="system-time">...</span></p>
-            <p>Uptime: <span id="uptime">...</span></p>
+            <p><span data-i18n="os"></span><span id="os-distro">...</span> (<span id="os-name">...</span> <span
+                    id="os-arch">...</span>)</p>
+            <p><span data-i18n="system_time"></span><span id="system-time">...</span></p>
+            <p><span data-i18n="uptime"></span><span id="uptime">...</span></p>
         </div>
         <h1>Go Glances</h1>
+        <div class="language-selector-container">
+            <select id="language-selector">
+                <option value="en">English</option>
+                <option value="ko">한국어</option>
+            </select>
+        </div>
         <div class="controls">
             <div class="auto-refresh-wrapper">
                 <label class="toggle-switch">
@@ -27,33 +38,37 @@
         </div>
         <div class="stats-grid">
             <div class="stats-card">
-                <h2>CPU</h2>
-                <p>Usage: <span id="cpu-usage">...</span>%</p>
+                <h2 data-i18n="cpu"></h2>
+                <p><span data-i18n="usage" class="label"></span><span id="cpu-usage" class="value">...</span>%</p>
                 <div class="usage-bar-container">
                     <div class="usage-bar" id="cpu-usage-bar"></div>
                 </div>
                 <div id="cpu-info-container">
-                    <p>CPU model name: <span id="cpu-model-name">...</span></p>
-                    <p>CPU Cores: <span id="cpu-cores">...</span></p>
-                    <p>CPU Max Frequency: <span id="cpu-frequency">...</span> Mhz</p>
+                    <p><span data-i18n="cpu_model" class="label"></span><span id="cpu-model-name"
+                            class="value">...</span></p>
+                    <p><span data-i18n="cpu_cores" class="label"></span><span id="cpu-cores" class="value">...</span>
+                    </p>
+                    <p><span data-i18n="cpu_max_frequency" class="label"></span><span id="cpu-frequency"
+                            class="value">...</span> Mhz</p>
                 </div>
             </div>
             <div class="stats-card">
-                <h2>Memory</h2>
-                <p>Used: <span id="mem-used">...</span> / <span id="mem-total">...</span> GB</p>
-                <p>Usage: <span id="mem-percent">...</span>%</p>
+                <h2 data-i18n="memory"></h2>
+                <p><span data-i18n="mem_used" class="label"></span><span id="mem-used" class="value">...</span> / <span
+                        id="mem-total" class="value">...</span> GB</p>
+                <p><span data-i18n="usage" class="label"></span><span id="mem-percent" class="value">...</span>%</p>
                 <div class="usage-bar-container">
                     <div class="usage-bar" id="mem-usage-bar"></div>
                 </div>
             </div>
             <div class="stats-card network-card">
-                <h2>Network</h2>
+                <h2 data-i18n="network"></h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>Interface</th>
-                            <th>Rxps</th>
-                            <th>Txps</th>
+                            <th data-i18n="interface"></th>
+                            <th data-i18n="rxps"></th>
+                            <th data-i18n="txps"></th>
                         </tr>
                     </thead>
                     <tbody id="network-interfaces-body">
@@ -62,14 +77,14 @@
                 </table>
             </div>
             <div class="stats-card fs-card">
-                <h2>File System</h2>
+                <h2 data-i18n="file_system"></h2>
                 <table>
                     <thead>
                         <tr>
-                            <th>Mount</th>
-                            <th>Used</th>
-                            <th>Total</th>
-                            <th>Used %</th>
+                            <th data-i18n="mount"></th>
+                            <th data-i18n="disk_used"></th>
+                            <th data-i18n="disk_total"></th>
+                            <th data-i18n="disk_used_percent"></th>
                         </tr>
                     </thead>
                     <tbody id="fs-body">
@@ -79,12 +94,12 @@
             </div>
         </div>
         <div id="per-core-usage-container">
-            <h2>Usage per core</h2>
+            <h2 data-i18n="usage_per_core"></h2>
             <table id="per-core-usage-table">
                 <thead>
                     <tr>
-                        <th>Core</th>
-                        <th>Usage (%)</th>
+                        <th data-i18n="cpu_core"></th>
+                        <th data-i18n="cpu_usage_percent"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,21 +108,21 @@
             </table>
         </div>
         <div id="pinned-process-container">
-            <h2>Pinned Processes</h2>
+            <h2 data-i18n="pinned_process"></h2>
             <table id="pinned-process-table">
                 <thead>
                     <tr>
-                        <th data-column="cpu">CPU%</th>
-                        <th data-column="memory">MEM%</th>
-                        <th data-column="virt">VIRT</th>
-                        <th data-column="res">RES</th>
-                        <th data-column="pid">PID</th>
-                        <th data-column="username">USER</th>
-                        <th data-column="cpu_time">TIME+</th>
-                        <th data-column="threads">THR</th>
-                        <th data-column="nice">NI</th>
-                        <th data-column="status">S</th>
-                        <th>Command</th>
+                        <th data-i18n="process_cpu" data-column="cpu"></th>
+                        <th data-i18n="process_memory" data-column="memory"></th>
+                        <th data-i18n="process_virtual" data-column="virt"></th>
+                        <th data-i18n="process_resident" data-column="res"></th>
+                        <th data-i18n="process_id" data-column="pid"></th>
+                        <th data-i18n="process_user" data-column="username"></th>
+                        <th data-i18n="process_time" data-column="cpu_time"></th>
+                        <th data-i18n="process_thread" data-column="threads"></th>
+                        <th data-i18n="process_nice" data-column="nice"></th>
+                        <th data-i18n="process_status" data-column="status"></th>
+                        <th data-i18n="process_command"></th>
                     </tr>
                 </thead>
                 <tbody id="pinned-process-list-body">
@@ -116,21 +131,21 @@
             </table>
         </div>
         <div id="process-container">
-            <h2>Processes</h2>
+            <h2 data-i18n="process"></h2>
             <table id="process-table">
                 <thead>
                     <tr>
-                        <th data-column="cpu">CPU%</th>
-                        <th data-column="memory">MEM%</th>
-                        <th data-column="virt">VIRT</th>
-                        <th data-column="res">RES</th>
-                        <th data-column="pid">PID</th>
-                        <th data-column="username">USER</th>
-                        <th data-column="cpu_time">TIME+</th>
-                        <th data-column="threads">THR</th>
-                        <th data-column="nice">NI</th>
-                        <th data-column="status">S</th>
-                        <th>Command</th>
+                        <th data-i18n="process_cpu" data-column="cpu"></th>
+                        <th data-i18n="process_memory" data-column="memory"></th>
+                        <th data-i18n="process_virtual" data-column="virt"></th>
+                        <th data-i18n="process_resident" data-column="res"></th>
+                        <th data-i18n="process_id" data-column="pid"></th>
+                        <th data-i18n="process_user" data-column="username"></th>
+                        <th data-i18n="process_time" data-column="cpu_time"></th>
+                        <th data-i18n="process_thread" data-column="threads"></th>
+                        <th data-i18n="process_nice" data-column="nice"></th>
+                        <th data-i18n="process_status" data-column="status"></th>
+                        <th data-i18n="process_command"></th>
                     </tr>
                 </thead>
                 <tbody id="process-list-body">

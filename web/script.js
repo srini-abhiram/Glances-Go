@@ -5,26 +5,65 @@ let pinnedPids = [];
 let autoRefreshInterval;
 let autoRefreshEnabled = JSON.parse(localStorage.getItem('autoRefreshEnabled')) !== false;
 
+i18next
+    .use(i18nextHttpBackend)
+    .use(i18nextBrowserLanguageDetector)
+    .init({
+        load: 'languageOnly',
+        fallbackLng: 'en',
+        detection: { order: ['navigator'] },
+        backend: {
+            loadPath: '/locales/{{lng}}.json'
+        },
+        debug: false
+    }, (err, t) => {
+        if (err) return console.log('something went wrong loading', err);
+        updateContent();
+        updateLanguage();
+    }); 
+
+i18next.on('languageChanged', (lng) => {
+    document.documentElement.lang = lng;
+    updateLanguage();
+}); 
+
+function updateContent() {
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        element.innerHTML = i18next.t(key);
+    });
+}
+
+function updateLanguage() {
+    const selector = document.getElementById('language-selector');
+    if (selector) {
+        const baseLanguage = i18next.language.split('-')[0];
+        selector.value = baseLanguage;
+    }
+}
+
 function formatUptime(seconds) {
+
     const d = Math.floor(seconds / (3600 * 24));
     const h = Math.floor((seconds % (3600 * 24)) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
 
-    let result = '';
+    const result = [];
+    
     if (d > 0) {
-        result += `${d}d `;
+        result.push(i18next.t('uptime_day', {count: d}));
     }
     if (h > 0) {
-        result += `${h}h `;
+        result.push(i18next.t('uptime_hour', {count: h}));
     }
     if (m > 0) {
-        result += `${m}m `;
+        result.push(i18next.t('uptime_minute', {count: m}));
     }
     if (s > 0) {
-        result += `${s}s`;
+        result.push(i18next.t('uptime_second', {count: s}));
     }
-    return result;
+    return result.join(' ');
 }
 
 function updateUsageBar(barId, percentage) {
@@ -281,6 +320,17 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshButton.addEventListener('click', () => {
             fetchStats();
             console.log("Manual refresh triggered.");
+        });
+    }
+
+    const selector = document.getElementById('language-selector');
+    if(selector) {
+        selector.addEventListener('change', (event) => {
+            const chosenLng = event.target.value;
+            i18next.changeLanguage(chosenLng, (err, t) => {
+                if (err) return console.error('An error has occurred while changing language', err);
+                updateContent();
+            });
         });
     }
 
