@@ -17,6 +17,7 @@ i18next
     }, (err, t) => {
         if (err) return console.log('something went wrong loading', err);
         updateContent();
+        updateLanguage();
     }); 
 
 i18next.on('languageChanged', (lng) => {
@@ -34,7 +35,8 @@ function updateContent() {
 function updateLanguage() {
     const selector = document.getElementById('language-selector');
     if (selector) {
-        selector.value = i18next.language;
+        const baseLanguage = i18next.language.split('-')[0];
+        selector.value = baseLanguage;
     }
 }
 
