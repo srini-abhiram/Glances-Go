@@ -3,7 +3,7 @@ let sortColumn = 'cpu';
 let sortAsc = false;
 let pinnedPids = [];
 let autoRefreshInterval;
-let autoRefreshEnabled = true;
+let autoRefreshEnabled = JSON.parse(localStorage.getItem('autoRefreshEnabled')) !== false;
 
 function formatUptime(seconds) {
     const d = Math.floor(seconds / (3600 * 24));
@@ -259,17 +259,15 @@ function updatePerCoreUsage(perCoreUsage) {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
-
     const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
     if (autoRefreshToggle) {
         autoRefreshToggle.checked = autoRefreshEnabled;
-
         if (autoRefreshEnabled) {
             startAutoRefresh();
         }
-
         autoRefreshToggle.addEventListener('change', function () {
             autoRefreshEnabled = this.checked;
+            localStorage.setItem('autoRefreshEnabled', autoRefreshEnabled);
             if (autoRefreshEnabled) {
                 startAutoRefresh();
             } else {
