@@ -76,7 +76,7 @@ function fetchStats() {
             document.getElementById('os-distro').textContent = data.os.distro;
             document.getElementById('os-name').textContent = data.os.name;
             document.getElementById('os-arch').textContent = data.os.architecture;
-            document.getElementById('system-time').textContent = new Date().toLocaleTimeString();
+            //document.getElementById('system-time').textContent = new Date().toLocaleTimeString();
             document.getElementById('uptime').textContent = formatUptime(data.uptime);
 
             processesData = data.processes || [];
@@ -259,6 +259,7 @@ function updatePerCoreUsage(perCoreUsage) {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
+    startSystemTimeClock();
     const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
     if (autoRefreshToggle) {
         autoRefreshToggle.checked = autoRefreshEnabled;
@@ -327,4 +328,14 @@ function stopAutoRefresh() {
         autoRefreshInterval = null;
         console.log("Auto-refresh stopped.");
     }
+}
+
+/**
+ * Starts an independent clock to update the system time every second 
+ */
+function startSystemTimeClock() {
+    setInterval(() => {
+        document.getElementById('system-time').textContent = new Date().toLocaleTimeString();
+    }, 1000);
+    console.log("System time clock started independently.");
 }
