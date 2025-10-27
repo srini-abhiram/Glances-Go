@@ -76,7 +76,6 @@ function fetchStats() {
             document.getElementById('os-distro').textContent = data.os.distro;
             document.getElementById('os-name').textContent = data.os.name;
             document.getElementById('os-arch').textContent = data.os.architecture;
-            //document.getElementById('system-time').textContent = new Date().toLocaleTimeString();
             document.getElementById('uptime').textContent = formatUptime(data.uptime);
 
             processesData = data.processes || [];

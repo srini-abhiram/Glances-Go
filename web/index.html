@@ -17,8 +17,11 @@
         <h1>Go Glances</h1>
         <div class="controls">
             <div class="auto-refresh-wrapper">
-                <input type="checkbox" id="auto-refresh-toggle" checked> <label for="auto-refresh-toggle"
-                    class="auto-refresh-label">Auto-Refresh</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-refresh-toggle" checked>
+                    <span class="toggle-slider round"></span>
+                </label>
+                <label for="auto-refresh-toggle" class="auto-refresh-label">Auto-Refresh</label>
             </div>
             <button id="refresh-button">Refresh</button>
         </div>
