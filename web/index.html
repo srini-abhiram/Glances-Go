@@ -1,132 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Go Glances</title>
-        <link rel="stylesheet" href="style.css" />
-    </head>
-    <body>
-        <div class="container">
-            <div id="system-info-container">
-                <p>OS: <span id="os-distro">...</span> (<span id="os-name">...</span> <span id="os-arch">...</span>)</p>
-                <p>System Time: <span id="system-time">...</span></p>
-                <p>Uptime: <span id="uptime">...</span></p>
-            </div>
-            <h1>Go Glances</h1>
-            <div class="stats-grid">
-                <div class="stats-card">
-                    <h2>CPU</h2>
-                    <p>Usage: <span id="cpu-usage">...</span>%</p>
-                    <div class="usage-bar-container">
-                        <div class="usage-bar" id="cpu-usage-bar"></div>
-                    </div>
-                    <div id="cpu-info-container">
-                        <p>CPU model name: <span id="cpu-model-name">...</span></p>
-                        <p>CPU Cores: <span id="cpu-cores">...</span></p>
-                        <p>CPU Max Frequency: <span id="cpu-frequency">...</span> Mhz</p>
-                    </div>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Go Glances</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <div id="system-info-container">
+            <p>OS: <span id="os-distro">...</span> (<span id="os-name">...</span> <span id="os-arch">...</span>)</p>
+            <p>System Time: <span id="system-time">...</span></p>
+            <p>Uptime: <span id="uptime">...</span></p>
+        </div>
+        <h1>Go Glances</h1>
+        <div class="controls">
+            <label class="switch">
+                <input type="checkbox" id="auto-refresh-toggle">
+                <span class="slider round"></span>
+            </label>
+            <label for="auto-refresh-toggle">Auto-Refresh</label>
+            <button id="refresh-button">Refresh</button>
+        </div>
+        <div class="stats-grid">
+            <div class="stats-card">
+                <h2>CPU</h2>
+                <p>Usage: <span id="cpu-usage">...</span>%</p>
+                <div class="usage-bar-container">
+                    <div class="usage-bar" id="cpu-usage-bar"></div>
                 </div>
-                <div class="stats-card">
-                    <h2>Memory</h2>
-                    <p>Used: <span id="mem-used">...</span> / <span id="mem-total">...</span> GB</p>
-                    <p>Usage: <span id="mem-percent">...</span>%</p>
-                    <div class="usage-bar-container">
-                        <div class="usage-bar" id="mem-usage-bar"></div>
-                    </div>
-                </div>
-                <div class="stats-card network-card">
-                    <h2>Network</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Interface</th>
-                                <th>Rxps</th>
-                                <th>Txps</th>
-                            </tr>
-                        </thead>
-                        <tbody id="network-interfaces-body">
-                            <!-- JS will populate this -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="stats-card fs-card">
-                    <h2>File System</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Mount</th>
-                                <th>Used</th>
-                                <th>Total</th>
-                                <th>Used %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="fs-body">
-                            <!-- JS will populate this -->
-                        </tbody>
-                    </table>
+                <div id="cpu-info-container">
+                    <p>CPU model name: <span id="cpu-model-name">...</span></p>
+                    <p>CPU Cores: <span id="cpu-cores">...</span></p>
+                    <p>CPU Max Frequency: <span id="cpu-frequency">...</span> Mhz</p>
                 </div>
             </div>
-            <div id="per-core-usage-container">
-                <h2>Usage per core</h2>
-                <table id="per-core-usage-table">
+            <div class="stats-card">
+                <h2>Memory</h2>
+                <p>Used: <span id="mem-used">...</span> / <span id="mem-total">...</span> GB</p>
+                <p>Usage: <span id="mem-percent">...</span>%</p>
+                <div class="usage-bar-container">
+                    <div class="usage-bar" id="mem-usage-bar"></div>
+                </div>
+            </div>
+            <div class="stats-card network-card">
+                <h2>Network</h2>
+                <table>
                     <thead>
                         <tr>
-                            <th>Core</th>
-                            <th>Usage (%)</th>
+                            <th>Interface</th>
+                            <th>Rxps</th>
+                            <th>Txps</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="network-interfaces-body">
                         <!-- JS will populate this -->
                     </tbody>
                 </table>
             </div>
-            <div id="pinned-process-container">
-                <h2>Pinned Processes</h2>
-                <table id="pinned-process-table">
+            <div class="stats-card fs-card">
+                <h2>File System</h2>
+                <table>
                     <thead>
                         <tr>
-                            <th data-column="cpu">CPU%</th>
-                            <th data-column="memory">MEM%</th>
-                            <th data-column="virt">VIRT</th>
-                            <th data-column="res">RES</th>
-                            <th data-column="pid">PID</th>
-                            <th data-column="username">USER</th>
-                            <th data-column="cpu_time">TIME+</th>
-                            <th data-column="threads">THR</th>
-                            <th data-column="nice">NI</th>
-                            <th data-column="status">S</th>
-                            <th>Command</th>
+                            <th>Mount</th>
+                            <th>Used</th>
+                            <th>Total</th>
+                            <th>Used %</th>
                         </tr>
                     </thead>
-                    <tbody id="pinned-process-list-body">
-                        <!-- JS will populate this -->
-                    </tbody>
-                </table>
-            </div>
-            <div id="process-container">
-                <h2>Processes</h2>
-                <table id="process-table">
-                    <thead>
-                        <tr>
-                            <th data-column="cpu">CPU%</th>
-                            <th data-column="memory">MEM%</th>
-                            <th data-column="virt">VIRT</th>
-                            <th data-column="res">RES</th>
-                            <th data-column="pid">PID</th>
-                            <th data-column="username">USER</th>
-                            <th data-column="cpu_time">TIME+</th>
-                            <th data-column="threads">THR</th>
-                            <th data-column="nice">NI</th>
-                            <th data-column="status">S</th>
-                            <th>Command</th>
-                        </tr>
-                    </thead>
-                    <tbody id="process-list-body">
+                    <tbody id="fs-body">
                         <!-- JS will populate this -->
                     </tbody>
                 </table>
             </div>
         </div>
-        <script src="script.js"></script>
-    </body>
+        <div id="per-core-usage-container">
+            <h2>Usage per core</h2>
+            <table id="per-core-usage-table">
+                <thead>
+                    <tr>
+                        <th>Core</th>
+                        <th>Usage (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+        <div id="pinned-process-container">
+            <h2>Pinned Processes</h2>
+            <table id="pinned-process-table">
+                <thead>
+                    <tr>
+                        <th data-column="cpu">CPU%</th>
+                        <th data-column="memory">MEM%</th>
+                        <th data-column="virt">VIRT</th>
+                        <th data-column="res">RES</th>
+                        <th data-column="pid">PID</th>
+                        <th data-column="username">USER</th>
+                        <th data-column="cpu_time">TIME+</th>
+                        <th data-column="threads">THR</th>
+                        <th data-column="nice">NI</th>
+                        <th data-column="status">S</th>
+                        <th>Command</th>
+                    </tr>
+                </thead>
+                <tbody id="pinned-process-list-body">
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+        <div id="process-container">
+            <h2>Processes</h2>
+            <table id="process-table">
+                <thead>
+                    <tr>
+                        <th data-column="cpu">CPU%</th>
+                        <th data-column="memory">MEM%</th>
+                        <th data-column="virt">VIRT</th>
+                        <th data-column="res">RES</th>
+                        <th data-column="pid">PID</th>
+                        <th data-column="username">USER</th>
+                        <th data-column="cpu_time">TIME+</th>
+                        <th data-column="threads">THR</th>
+                        <th data-column="nice">NI</th>
+                        <th data-column="status">S</th>
+                        <th>Command</th>
+                    </tr>
+                </thead>
+                <tbody id="process-list-body">
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
 </html>
