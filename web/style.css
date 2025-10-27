@@ -18,6 +18,22 @@ h1 {
     margin-bottom: 2em;
 }
 
+.language-selector-container {
+    text-align: right;
+    margin-bottom: 1em;
+}
+
+
+#language-selector {
+    background-color: #252526; 
+    color: #d4d4d4; 
+    border: 1px solid #333;
+    padding: 0.5em;
+    border-radius: 4px;
+    font-family: inherit; 
+    cursor: pointer;
+}
+
 #system-info-container {
     display: flex;
     justify-content: space-between;
@@ -259,18 +275,3 @@ h1 {
 }
 
 
-.language-selector-container {
-    text-align: right;
-    margin-bottom: 1em;
-}
-
-
-#language-selector {
-    background-color: #252526; 
-    color: #d4d4d4; 
-    border: 1px solid #333;
-    padding: 0.5em;
-    border-radius: 4px;
-    font-family: inherit; 
-    cursor: pointer;
-}

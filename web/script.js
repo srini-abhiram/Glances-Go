@@ -9,15 +9,20 @@ i18next
     .init({
         load: 'languageOnly',
         fallbackLng: 'en',
-        detection: { order: ["navigator"] },
+        detection: { order: ['navigator'] },
         backend: {
             loadPath: '/locales/{{lng}}.json'
         },
-        debug: true
+        debug: false
     }, (err, t) => {
         if (err) return console.log('something went wrong loading', err);
         updateContent();
     }); 
+
+i18next.on('languageChanged', (lng) => {
+    document.documentElement.lang = lng;
+    updateLanguage();
+}); 
 
 function updateContent() {
     document.querySelectorAll('[data-i18n]').forEach(element => {
