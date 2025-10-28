@@ -1,7 +1,11 @@
+const AUTO_REFRESH_ENABLED_KEY = 'autoRefreshEnabled';
+
 let processesData = [];
 let sortColumn = 'cpu';
 let sortAsc = false;
 let pinnedPids = [];
+let autoRefreshInterval;
+let autoRefreshEnabled = JSON.parse(localStorage.getItem(AUTO_REFRESH_ENABLED_KEY)) !== false;
 
 i18next
     .use(i18nextHttpBackend)
@@ -18,12 +22,12 @@ i18next
         if (err) return console.log('something went wrong loading', err);
         updateContent();
         updateLanguage();
-    }); 
+    });
 
 i18next.on('languageChanged', (lng) => {
     document.documentElement.lang = lng;
     updateLanguage();
-}); 
+});
 
 function updateContent() {
     document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -48,18 +52,18 @@ function formatUptime(seconds) {
     const s = Math.floor(seconds % 60);
 
     const result = [];
-    
+
     if (d > 0) {
-        result.push(i18next.t('uptime_day', {count: d}));
+        result.push(i18next.t('uptime_day', { count: d }));
     }
     if (h > 0) {
-        result.push(i18next.t('uptime_hour', {count: h}));
+        result.push(i18next.t('uptime_hour', { count: h }));
     }
     if (m > 0) {
-        result.push(i18next.t('uptime_minute', {count: m}));
+        result.push(i18next.t('uptime_minute', { count: m }));
     }
     if (s > 0) {
-        result.push(i18next.t('uptime_second', {count: s}));
+        result.push(i18next.t('uptime_second', { count: s }));
     }
     return result.join(' ');
 }
@@ -83,7 +87,12 @@ function updateUsageBar(barId, percentage) {
 
 function fetchStats() {
     fetch('/stats')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             // Update CPU
             const cpuUsage = data.cpu_usage.toFixed(2);
@@ -108,7 +117,6 @@ function fetchStats() {
             document.getElementById('os-distro').textContent = data.os.distro;
             document.getElementById('os-name').textContent = data.os.name;
             document.getElementById('os-arch').textContent = data.os.architecture;
-            document.getElementById('system-time').textContent = new Date().toLocaleTimeString();
             document.getElementById('uptime').textContent = formatUptime(data.uptime);
 
             processesData = data.processes || [];
@@ -291,10 +299,34 @@ function updatePerCoreUsage(perCoreUsage) {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
-    setInterval(fetchStats, 2000);
+    startSystemTimeClock();
+    const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
+    if (autoRefreshToggle) {
+        autoRefreshToggle.checked = autoRefreshEnabled;
+        if (autoRefreshEnabled) {
+            startAutoRefresh();
+        }
+        autoRefreshToggle.addEventListener('change', function () {
+            autoRefreshEnabled = this.checked;
+            localStorage.setItem(AUTO_REFRESH_ENABLED_KEY, autoRefreshEnabled);
+            if (autoRefreshEnabled) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        });
+    }
+
+    const refreshButton = document.getElementById('refresh-button');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', () => {
+            fetchStats();
+            console.log("Manual refresh triggered.");
+        });
+    }
 
     const selector = document.getElementById('language-selector');
-    if(selector) {
+    if (selector) {
         selector.addEventListener('change', (event) => {
             const chosenLng = event.target.value;
             i18next.changeLanguage(chosenLng, (err, t) => {
@@ -326,3 +358,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+/**
+ * Starts the auto-refresh interval for fetching statistics.
+ */
+function startAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+    autoRefreshInterval = setInterval(fetchStats, 2000);
+    console.log("Auto-refresh started.");
+}
+
+/**
+ * Stops the auto-refresh interval.
+ */
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+        console.log("Auto-refresh stopped.");
+    }
+}
+
+/**
+ * Starts an independent clock to update the system time every second 
+ */
+function startSystemTimeClock() {
+    setInterval(() => {
+        document.getElementById('system-time').textContent = new Date().toLocaleTimeString();
+    }, 1000);
+    console.log("System time clock started independently.");
+}

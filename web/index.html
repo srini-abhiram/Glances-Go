@@ -1,142 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <script src="https://unpkg.com/i18next/i18next.min.js"></script>
-        <script src="https://unpkg.com/i18next-http-backend/i18nextHttpBackend.min.js"></script>
-        <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
-        <meta charset="UTF-8" />
-        <title>Go Glances</title>
-        <link rel="stylesheet" href="style.css" />
-    </head>
-    <body>
-        <div class="container">
-            
-            <div id="system-info-container">
-                <p><span data-i18n="os"></span><span id="os-distro">...</span> (<span id="os-name">...</span> <span id="os-arch">...</span>)</p>
-                <p><span data-i18n="system_time"></span><span id="system-time">...</span></p>
-                <p><span data-i18n="uptime"></span><span id="uptime">...</span></p>
+
+<head>
+    <script src="https://unpkg.com/i18next/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-http-backend/i18nextHttpBackend.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
+    <meta charset="UTF-8" />
+    <title>Go Glances</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <div id="system-info-container">
+            <p><span data-i18n="os"></span><span id="os-distro">...</span> (<span id="os-name">...</span> <span
+                    id="os-arch">...</span>)</p>
+            <p><span data-i18n="system_time"></span><span id="system-time">...</span></p>
+            <p><span data-i18n="uptime"></span><span id="uptime">...</span></p>
+        </div>
+        <h1>Go Glances</h1>
+        <div class="controls-bar">
+            <div class="auto-refresh-controls">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="auto-refresh-toggle" checked>
+                    <span class="toggle-slider round"></span>
+                </label>
+                <label for="auto-refresh-toggle" class="auto-refresh-label">Auto-Refresh</label>
+                <button id="refresh-button">Refresh</button>
             </div>
-            <h1>Go Glances</h1>
-            <div class="language-selector-container">
-                <select id="language-selector">
-                    <option value="en">English</option>
-                    <option value="ko">한국어</option> 
-                </select>
-            </div>
-            <div class="stats-grid">
-                <div class="stats-card">
-                    <h2 data-i18n="cpu"></h2>
-                    <p><span data-i18n="usage" class ="label"></span><span id="cpu-usage" class="value">...</span>%</p>
-                    <div class="usage-bar-container">
-                        <div class="usage-bar" id="cpu-usage-bar"></div>
-                    </div>
-                    <div id="cpu-info-container">
-                        <p><span data-i18n="cpu_model" class="label"></span><span id="cpu-model-name" class="value">...</span></p>
-                        <p><span data-i18n="cpu_cores" class="label"></span><span id="cpu-cores" class="value">...</span></p>
-                        <p><span data-i18n="cpu_max_frequency" class="label"></span><span id="cpu-frequency" class="value">...</span> Mhz</p>
-                    </div>
+            <select id="language-selector">
+                <option value="en">English</option>
+                <option value="ko">한국어</option>
+            </select>
+        </div>
+        <div class="stats-grid">
+            <div class="stats-card">
+                <h2 data-i18n="cpu"></h2>
+                <p><span data-i18n="usage" class="label"></span><span id="cpu-usage" class="value">...</span>%</p>
+                <div class="usage-bar-container">
+                    <div class="usage-bar" id="cpu-usage-bar"></div>
                 </div>
-                <div class="stats-card">
-                    <h2 data-i18n="memory"></h2>
-                    <p><span data-i18n="mem_used" class="label"></span><span id="mem-used" class="value">...</span> / <span id="mem-total" class="value">...</span> GB</p>
-                    <p><span data-i18n="usage" class="label"></span><span id="mem-percent" class="value">...</span>%</p>
-                    <div class="usage-bar-container">
-                        <div class="usage-bar" id="mem-usage-bar"></div>
-                    </div>
-                </div>
-                <div class="stats-card network-card">
-                    <h2 data-i18n="network"></h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th data-i18n="interface"></th>
-                                <th data-i18n="rxps"></th>
-                                <th data-i18n="txps"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="network-interfaces-body">
-                            <!-- JS will populate this -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="stats-card fs-card">
-                    <h2 data-i18n="file_system"></h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th data-i18n="mount"></th>
-                                <th data-i18n="disk_used"></th>
-                                <th data-i18n="disk_total"></th>
-                                <th data-i18n="disk_used_percent"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="fs-body">
-                            <!-- JS will populate this -->
-                        </tbody>
-                    </table>
+                <div id="cpu-info-container">
+                    <p><span data-i18n="cpu_model" class="label"></span><span id="cpu-model-name"
+                            class="value">...</span></p>
+                    <p><span data-i18n="cpu_cores" class="label"></span><span id="cpu-cores" class="value">...</span>
+                    </p>
+                    <p><span data-i18n="cpu_max_frequency" class="label"></span><span id="cpu-frequency"
+                            class="value">...</span> Mhz</p>
                 </div>
             </div>
-            <div id="per-core-usage-container">
-                <h2 data-i18n="usage_per_core"></h2>
-                <table id="per-core-usage-table">
+            <div class="stats-card">
+                <h2 data-i18n="memory"></h2>
+                <p><span data-i18n="mem_used" class="label"></span><span id="mem-used" class="value">...</span> / <span
+                        id="mem-total" class="value">...</span> GB</p>
+                <p><span data-i18n="usage" class="label"></span><span id="mem-percent" class="value">...</span>%</p>
+                <div class="usage-bar-container">
+                    <div class="usage-bar" id="mem-usage-bar"></div>
+                </div>
+            </div>
+            <div class="stats-card network-card">
+                <h2 data-i18n="network"></h2>
+                <table>
                     <thead>
                         <tr>
-                            <th data-i18n="cpu_core"></th>
-                            <th data-i18n="cpu_usage_percent"></th>
+                            <th data-i18n="interface"></th>
+                            <th data-i18n="rxps"></th>
+                            <th data-i18n="txps"></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="network-interfaces-body">
                         <!-- JS will populate this -->
                     </tbody>
                 </table>
             </div>
-            <div id="pinned-process-container">
-                <h2 data-i18n="pinned_process"></h2>
-                <table id="pinned-process-table">
+            <div class="stats-card fs-card">
+                <h2 data-i18n="file_system"></h2>
+                <table>
                     <thead>
                         <tr>
-                            <th data-i18n="process_cpu" data-column="cpu"></th>
-                            <th data-i18n="process_memory" data-column="memory"></th>
-                            <th data-i18n="process_virtual" data-column="virt"></th>
-                            <th data-i18n="process_resident" data-column="res"></th>
-                            <th data-i18n="process_id" data-column="pid"></th>
-                            <th data-i18n="process_user" data-column="username"></th>
-                            <th data-i18n="process_time" data-column="cpu_time"></th>
-                            <th data-i18n="process_thread" data-column="threads"></th>
-                            <th data-i18n="process_nice" data-column="nice"></th>
-                            <th data-i18n="process_status" data-column="status"></th>
-                            <th data-i18n="process_command"></th>
+                            <th data-i18n="mount"></th>
+                            <th data-i18n="disk_used"></th>
+                            <th data-i18n="disk_total"></th>
+                            <th data-i18n="disk_used_percent"></th>
                         </tr>
                     </thead>
-                    <tbody id="pinned-process-list-body">
-                        <!-- JS will populate this -->
-                    </tbody>
-                </table>
-            </div>
-            <div id="process-container">
-                <h2 data-i18n="process"></h2>
-                <table id="process-table">
-                    <thead>
-                        <tr>
-                            <th data-i18n="process_cpu" data-column="cpu"></th>
-                            <th data-i18n="process_memory" data-column="memory"></th>
-                            <th data-i18n="process_virtual" data-column="virt"></th>
-                            <th data-i18n="process_resident" data-column="res"></th>
-                            <th data-i18n="process_id" data-column="pid"></th>
-                            <th data-i18n="process_user" data-column="username"></th>
-                            <th data-i18n="process_time" data-column="cpu_time"></th>
-                            <th data-i18n="process_thread" data-column="threads"></th>
-                            <th data-i18n="process_nice" data-column="nice"></th>
-                            <th data-i18n="process_status" data-column="status"></th>
-                            <th data-i18n="process_command"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="process-list-body">
+                    <tbody id="fs-body">
                         <!-- JS will populate this -->
                     </tbody>
                 </table>
             </div>
         </div>
-        <script src="script.js"></script>
-    </body>
+        <div id="per-core-usage-container">
+            <h2 data-i18n="usage_per_core"></h2>
+            <table id="per-core-usage-table">
+                <thead>
+                    <tr>
+                        <th data-i18n="cpu_core"></th>
+                        <th data-i18n="cpu_usage_percent"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+        <div id="pinned-process-container">
+            <h2 data-i18n="pinned_process"></h2>
+            <table id="pinned-process-table">
+                <thead>
+                    <tr>
+                        <th data-i18n="process_cpu" data-column="cpu"></th>
+                        <th data-i18n="process_memory" data-column="memory"></th>
+                        <th data-i18n="process_virtual" data-column="virt"></th>
+                        <th data-i18n="process_resident" data-column="res"></th>
+                        <th data-i18n="process_id" data-column="pid"></th>
+                        <th data-i18n="process_user" data-column="username"></th>
+                        <th data-i18n="process_time" data-column="cpu_time"></th>
+                        <th data-i18n="process_thread" data-column="threads"></th>
+                        <th data-i18n="process_nice" data-column="nice"></th>
+                        <th data-i18n="process_status" data-column="status"></th>
+                        <th data-i18n="process_command"></th>
+                    </tr>
+                </thead>
+                <tbody id="pinned-process-list-body">
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+        <div id="process-container">
+            <h2 data-i18n="process"></h2>
+            <table id="process-table">
+                <thead>
+                    <tr>
+                        <th data-i18n="process_cpu" data-column="cpu"></th>
+                        <th data-i18n="process_memory" data-column="memory"></th>
+                        <th data-i18n="process_virtual" data-column="virt"></th>
+                        <th data-i18n="process_resident" data-column="res"></th>
+                        <th data-i18n="process_id" data-column="pid"></th>
+                        <th data-i18n="process_user" data-column="username"></th>
+                        <th data-i18n="process_time" data-column="cpu_time"></th>
+                        <th data-i18n="process_thread" data-column="threads"></th>
+                        <th data-i18n="process_nice" data-column="nice"></th>
+                        <th data-i18n="process_status" data-column="status"></th>
+                        <th data-i18n="process_command"></th>
+                    </tr>
+                </thead>
+                <tbody id="process-list-body">
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
 </html>

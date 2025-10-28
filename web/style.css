@@ -13,24 +13,109 @@ body {
 
 h1 {
     text-align: center;
-    color: #4ec9b0; /* Teal */
+    color: #4ec9b0;
+    /* Teal */
     font-weight: normal;
     margin-bottom: 2em;
 }
 
-.language-selector-container {
-    text-align: right;
+.controls-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 0;
     margin-bottom: 1em;
 }
 
+.auto-refresh-controls {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #333;
+    transition: .4s;
+    border: 1px solid #4ec9b0;
+    border-radius: 22px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 2px;
+    background-color: #d4d4d4;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked+.toggle-slider {
+    background-color: #4ec9b0;
+    border-color: #4ec9b0;
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+    transform: translateX(17px);
+    background-color: #1e1e1e;
+}
+
+.auto-refresh-label {
+    font-size: 0.9em;
+    color: #d4d4d4;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 16px;
+    margin-left: 10px;
+}
+
+#refresh-button {
+    background-color: #2a523f;
+    color: #d4d4d4;
+    border: 1px solid #4ec9b0;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.85em;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    line-height: 1;
+}
+
+#refresh-button:hover {
+    background-color: #4ec9b0;
+    color: #1e1e1e;
+}
 
 #language-selector {
-    background-color: #252526; 
-    color: #d4d4d4; 
+    background-color: #252526;
+    color: #d4d4d4;
     border: 1px solid #333;
     padding: 0.5em;
     border-radius: 4px;
-    font-family: inherit; 
+    font-family: inherit;
     cursor: pointer;
 }
 
@@ -82,12 +167,14 @@ h1 {
     background-color: #252526;
     padding: 1.5em;
     border-radius: 4px;
-    border-left: 4px solid #4ec9b0; /* Teal accent */
+    border-left: 4px solid #4ec9b0;
+    /* Teal accent */
 }
 
 .stats-card h2 {
     margin-top: 0;
-    color: #9cdcfe; /* Light Blue */
+    color: #9cdcfe;
+    /* Light Blue */
     font-size: 1.1em;
     border-bottom: 1px solid #333;
     padding-bottom: 0.5em;
@@ -100,15 +187,18 @@ h1 {
 }
 
 
-.stats-card .value { /* this part will display the stat card's value */
+.stats-card .value {
+    /* this part will display the stat card's value */
     font-weight: bold;
-    color: #b5cea8; /* Green */
+    color: #b5cea8;
+    /* Green */
 }
 
-.stats-card .label { /* this part will display the stat card's label */
-    font-weight: normal; 
-    color: #d4d4d4; 
-    margin-right: 0.5em; 
+.stats-card .label {
+    /* this part will display the stat card's label */
+    font-weight: normal;
+    color: #d4d4d4;
+    margin-right: 0.5em;
 }
 
 .usage-bar-container {
@@ -154,7 +244,8 @@ h1 {
 #process-container h2,
 #pinned-process-container h2 {
     margin-top: 0;
-    color: #9cdcfe; /* Light Blue */
+    color: #9cdcfe;
+    /* Light Blue */
 }
 
 #process-table,
@@ -167,7 +258,8 @@ h1 {
 #process-table thead,
 #pinned-process-table thead {
     text-align: left;
-    color: #4ec9b0; /* Teal */
+    color: #4ec9b0;
+    /* Teal */
 }
 
 #process-table th,
@@ -210,7 +302,8 @@ h1 {
 
 #per-core-usage-container h2 {
     margin-top: 0;
-    color: #9cdcfe; /* Light Blue */
+    color: #9cdcfe;
+    /* Light Blue */
 }
 
 #per-core-usage-table {
@@ -221,7 +314,8 @@ h1 {
 
 #per-core-usage-table thead {
     text-align: left;
-    color: #4ec9b0; /* Teal */
+    color: #4ec9b0;
+    /* Teal */
 }
 
 #per-core-usage-table th,
@@ -273,5 +367,3 @@ h1 {
 .core-usage-bar.medium-usage {
     background: linear-gradient(90deg, #dcdcaa, #d7ba7d);
 }
-
-
