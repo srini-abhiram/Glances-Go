@@ -12,7 +12,6 @@
 
 <body>
     <div class="container">
-
         <div id="system-info-container">
             <p><span data-i18n="os"></span><span id="os-distro">...</span> (<span id="os-name">...</span> <span
                     id="os-arch">...</span>)</p>
@@ -20,21 +19,19 @@
             <p><span data-i18n="uptime"></span><span id="uptime">...</span></p>
         </div>
         <h1>Go Glances</h1>
-        <div class="language-selector-container">
-            <select id="language-selector">
-                <option value="en">English</option>
-                <option value="ko">한국어</option>
-            </select>
-        </div>
-        <div class="controls">
-            <div class="auto-refresh-wrapper">
+        <div class="controls-bar">
+            <div class="auto-refresh-controls">
                 <label class="toggle-switch">
                     <input type="checkbox" id="auto-refresh-toggle" checked>
                     <span class="toggle-slider round"></span>
                 </label>
                 <label for="auto-refresh-toggle" class="auto-refresh-label">Auto-Refresh</label>
+                <button id="refresh-button">Refresh</button>
             </div>
-            <button id="refresh-button">Refresh</button>
+            <select id="language-selector">
+                <option value="en">English</option>
+                <option value="ko">한국어</option>
+            </select>
         </div>
         <div class="stats-grid">
             <div class="stats-card">
