@@ -1,9 +1,11 @@
+const AUTO_REFRESH_ENABLED_KEY = 'autoRefreshEnabled';
+
 let processesData = [];
 let sortColumn = 'cpu';
 let sortAsc = false;
 let pinnedPids = [];
 let autoRefreshInterval;
-let autoRefreshEnabled = JSON.parse(localStorage.getItem('autoRefreshEnabled')) !== false;
+let autoRefreshEnabled = JSON.parse(localStorage.getItem(AUTO_REFRESH_ENABLED_KEY)) !== false;
 
 i18next
     .use(i18nextHttpBackend)
@@ -20,12 +22,12 @@ i18next
         if (err) return console.log('something went wrong loading', err);
         updateContent();
         updateLanguage();
-    }); 
+    });
 
 i18next.on('languageChanged', (lng) => {
     document.documentElement.lang = lng;
     updateLanguage();
-}); 
+});
 
 function updateContent() {
     document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -50,18 +52,18 @@ function formatUptime(seconds) {
     const s = Math.floor(seconds % 60);
 
     const result = [];
-    
+
     if (d > 0) {
-        result.push(i18next.t('uptime_day', {count: d}));
+        result.push(i18next.t('uptime_day', { count: d }));
     }
     if (h > 0) {
-        result.push(i18next.t('uptime_hour', {count: h}));
+        result.push(i18next.t('uptime_hour', { count: h }));
     }
     if (m > 0) {
-        result.push(i18next.t('uptime_minute', {count: m}));
+        result.push(i18next.t('uptime_minute', { count: m }));
     }
     if (s > 0) {
-        result.push(i18next.t('uptime_second', {count: s}));
+        result.push(i18next.t('uptime_second', { count: s }));
     }
     return result.join(' ');
 }
@@ -306,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         autoRefreshToggle.addEventListener('change', function () {
             autoRefreshEnabled = this.checked;
-            localStorage.setItem('autoRefreshEnabled', autoRefreshEnabled);
+            localStorage.setItem(AUTO_REFRESH_ENABLED_KEY, autoRefreshEnabled);
             if (autoRefreshEnabled) {
                 startAutoRefresh();
             } else {
@@ -324,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const selector = document.getElementById('language-selector');
-    if(selector) {
+    if (selector) {
         selector.addEventListener('change', (event) => {
             const chosenLng = event.target.value;
             i18next.changeLanguage(chosenLng, (err, t) => {
