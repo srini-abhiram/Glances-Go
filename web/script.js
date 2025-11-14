@@ -85,6 +85,18 @@ function updateUsageBar(barId, percentage) {
     }
 }
 
+async function copyText(el) {
+    const text = el.textContent.trim();
+
+    try {
+        await navigator.clipboard.writeText(text);
+        el.setAttribute("data-tooltip", "Copied!");
+    } catch (err) {
+        console.error("Failed:", err);
+        el.setAttribute("data-tooltip", "Failed");
+    }
+}
+
 function fetchStats() {
     fetch('/stats')
         .then(response => {
@@ -230,7 +242,11 @@ function renderTables() {
             <td>${proc.threads}</td>
             <td>${proc.nice}</td>
             <td>${proc.status}</td>
-            <td>${proc.name}</td>
+            <td class="process-name-cell">
+                <span class="copy-text process-name-text" data-tooltip="Click to copy">
+                    ${proc.name}
+                </span>
+            </td>
         `;
         row.dataset.pid = proc.pid;
 
@@ -345,6 +361,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('process-list-body').addEventListener('click', e => {
+        const nameText = e.target.closest('.process-name-text');
+        if (nameText) {
+            copyText(nameText);
+            return;
+        }
         const row = e.target.closest('tr');
         if (row) {
             togglePin(parseInt(row.dataset.pid, 10));
@@ -352,10 +373,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('pinned-process-list-body').addEventListener('click', e => {
+        const nameText = e.target.closest('.process-name-text');
+        if (nameText) {
+            copyText(nameText);
+            return;
+        }
+
         const row = e.target.closest('tr');
         if (row) {
             togglePin(parseInt(row.dataset.pid, 10));
         }
+    });
+
+    document.getElementById('process-list-body').addEventListener('mouseover', e => {
+        const nameText = e.target.closest('.process-name-text');
+        if (nameText) {
+            nameText.setAttribute('data-tooltip', 'Click to copy');
+        }
+    });
+
+    document.getElementById('pinned-process-list-body').addEventListener('mouseover', e => {
+        const nameText = e.target.closest('.process-name-text');
+        if (nameText) {
+            nameText.setAttribute('data-tooltip', 'Click to copy');
+        }
+    });
+
+    const items = document.querySelectorAll(".copy-text");
+    items.forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+            el.setAttribute("data-tooltip", "Click to copy");
+        });
+
+        el.addEventListener("click", () => {
+            copyText(el);
+        });
     });
 });
 
