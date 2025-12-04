@@ -367,3 +367,35 @@ h1 {
 .core-usage-bar.medium-usage {
     background: linear-gradient(90deg, #dcdcaa, #d7ba7d);
 }
+
+.copy-text {
+    position: relative;
+    cursor: pointer;
+}
+
+.copy-text::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -120%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #333;
+    color: #fff;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+}
+
+.copy-text:hover::after {
+    opacity: 1;
+}
+
+.copy-text:hover {
+    text-decoration: underline;
+}
