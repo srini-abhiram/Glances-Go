@@ -399,3 +399,40 @@ h1 {
 .copy-text:hover {
     text-decoration: underline;
 }
+/* History Charts */
+#history-container {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+}
+
+#history-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.history-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+}
+
+.history-chart-card {
+    background-color: #252525;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.history-chart-card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #4CAF50;
+    font-size: 16px;
+}
+
+.history-chart-card canvas {
+    width: 100%;
+    display: block;
+}
