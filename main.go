@@ -45,12 +45,12 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	var (
-		port                string
-		cacheTTL            time.Duration
-		maxProcesses        int
-		enableHistory       bool
-		historyInterval     time.Duration
-		historyRetention    time.Duration
+		port             string
+		cacheTTL         time.Duration
+		maxProcesses     int
+		enableHistory    bool
+		historyInterval  time.Duration
+		historyRetention time.Duration
 	)
 
 	// Custom usage: print flags only.
