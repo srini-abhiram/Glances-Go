@@ -90,6 +90,19 @@
                 </table>
             </div>
         </div>
+        <div id="history-container" style="display: none;">
+            <h2>24-Hour Metrics History</h2>
+            <div class="history-charts">
+                <div class="history-chart-card">
+                    <h3>CPU Usage (%)</h3>
+                    <canvas id="cpu-history-chart"></canvas>
+                </div>
+                <div class="history-chart-card">
+                    <h3>Memory Usage (%)</h3>
+                    <canvas id="memory-history-chart"></canvas>
+                </div>
+            </div>
+        </div>
         <div id="per-core-usage-container">
             <h2 data-i18n="usage_per_core"></h2>
             <table id="per-core-usage-table">

@@ -6,6 +6,9 @@ let sortAsc = false;
 let pinnedPids = [];
 let autoRefreshInterval;
 let autoRefreshEnabled = JSON.parse(localStorage.getItem(AUTO_REFRESH_ENABLED_KEY)) !== false;
+let historyData = [];
+let cpuHistoryChart = null;
+let memoryHistoryChart = null;
 
 i18next
     .use(i18nextHttpBackend)
@@ -151,6 +154,32 @@ function fetchStats() {
         .catch(error => console.error('Error fetching stats:', error));
 }
 
+function fetchHistory() {
+    fetch('/history')
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 503) {
+                    // History is disabled
+                    document.getElementById('history-container').style.display = 'none';
+                    return null;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.length > 0) {
+                historyData = data;
+                document.getElementById('history-container').style.display = 'block';
+                updateHistoryCharts();
+            } else if (data) {
+                // Empty array, history is enabled but no data yet
+                document.getElementById('history-container').style.display = 'block';
+            }
+        })
+        .catch(error => console.error('Error fetching history:', error));
+}
+
 function updateFileSystemUsage(fsData) {
     const tbody = document.getElementById('fs-body');
     tbody.innerHTML = '';
@@ -280,6 +309,126 @@ function togglePin(pid) {
     renderTables();
 }
 
+function drawChart(canvasId, data, label, color) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = canvas.offsetWidth;
+    const height = canvas.height = 200;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+
+    if (!data || data.length === 0) {
+        ctx.fillStyle = '#666';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('No historical data available yet', width / 2, height / 2);
+        return;
+    }
+
+    // Calculate dimensions
+    const padding = 40;
+    const chartWidth = width - 2 * padding;
+    const chartHeight = height - 2 * padding;
+
+    // Find min and max values
+    const values = data.map(d => d.value);
+    const maxValue = Math.max(...values, 100); // At least 100 for percentage
+    const minValue = Math.min(...values, 0);
+
+    // Draw axes
+    ctx.strokeStyle = '#444';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, height - padding);
+    ctx.lineTo(width - padding, height - padding);
+    ctx.stroke();
+
+    // Draw grid lines
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= 5; i++) {
+        const y = padding + (chartHeight * i / 5);
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(width - padding, y);
+        ctx.stroke();
+
+        // Y-axis labels
+        const value = maxValue - (maxValue - minValue) * i / 5;
+        ctx.fillStyle = '#999';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillText(value.toFixed(1), padding - 5, y + 3);
+    }
+
+    // Draw line
+    if (data.length > 1) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        data.forEach((point, index) => {
+            const x = padding + (chartWidth * index / (data.length - 1));
+            const y = height - padding - ((point.value - minValue) / (maxValue - minValue) * chartHeight);
+
+            if (index === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        });
+
+        ctx.stroke();
+
+        // Draw points
+        ctx.fillStyle = color;
+        data.forEach((point, index) => {
+            const x = padding + (chartWidth * index / (data.length - 1));
+            const y = height - padding - ((point.value - minValue) / (maxValue - minValue) * chartHeight);
+
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+    }
+
+    // X-axis labels (show time for first and last point)
+    if (data.length > 0) {
+        ctx.fillStyle = '#999';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'left';
+        const firstTime = new Date(data[0].timestamp).toLocaleTimeString();
+        ctx.fillText(firstTime, padding, height - padding + 15);
+
+        ctx.textAlign = 'right';
+        const lastTime = new Date(data[data.length - 1].timestamp).toLocaleTimeString();
+        ctx.fillText(lastTime, width - padding, height - padding + 15);
+    }
+}
+
+function updateHistoryCharts() {
+    if (!historyData || historyData.length === 0) return;
+
+    // Prepare CPU data
+    const cpuData = historyData.map(point => ({
+        timestamp: point.timestamp,
+        value: point.cpu_usage
+    }));
+
+    // Prepare Memory data
+    const memData = historyData.map(point => ({
+        timestamp: point.timestamp,
+        value: point.mem_used_percent
+    }));
+
+    drawChart('cpu-history-chart', cpuData, 'CPU Usage', '#4CAF50');
+    drawChart('memory-history-chart', memData, 'Memory Usage', '#2196F3');
+}
+
 function updatePerCoreUsage(perCoreUsage) {
     const tbody = document.querySelector('#per-core-usage-table tbody');
 
@@ -352,6 +501,7 @@ function updatePerCoreUsage(perCoreUsage) {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
+    fetchHistory();
     startSystemTimeClock();
     const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
     if (autoRefreshToggle) {
@@ -374,7 +524,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (refreshButton) {
         refreshButton.addEventListener('click', () => {
             fetchStats();
-            console.log('Manual refresh triggered.');
+            fetchHistory();
+            console.log("Manual refresh triggered.");
         });
     }
 
@@ -455,8 +606,11 @@ function startAutoRefresh() {
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
     }
-    autoRefreshInterval = setInterval(fetchStats, 2000);
-    console.log('Auto-refresh started.');
+    autoRefreshInterval = setInterval(() => {
+        fetchStats();
+        fetchHistory();
+    }, 2000);
+    console.log("Auto-refresh started.");
 }
 
 /**
